@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,7 +29,7 @@
             text-align: center;
             margin-bottom: 30px;
             font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .card {
@@ -36,7 +37,7 @@
             border-radius: 15px;
             padding: 25px;
             margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
         .card h2 {
@@ -118,7 +119,8 @@
             background: white;
         }
 
-        th, td {
+        th,
+        td {
             padding: 12px;
             text-align: left;
             border: 1px solid #ddd;
@@ -178,6 +180,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>🎓 Automated Timetable Scheduling System</h1>
@@ -273,13 +276,13 @@
         async function generateTimetable() {
             showStatus('Generating timetable... ⏳', 'info');
             document.getElementById('results').innerHTML = '<div class="loading">Generating timetable...</div>';
-            
+
             try {
                 const response = await fetch(`${API_URL}/timetable/generate`, {
                     method: 'POST'
                 });
                 const data = await response.json();
-                
+
                 if (response.ok) {
                     showStatus(`Timetable generated successfully! ${data.entries} classes scheduled. ✅`, 'success');
                     displayJSON(data);
@@ -297,11 +300,11 @@
         async function viewTimetable() {
             showStatus('Loading timetable... ⏳', 'info');
             document.getElementById('results').innerHTML = '<div class="loading">Loading timetable...</div>';
-            
+
             try {
                 const response = await fetch(`${API_URL}/timetable`);
                 const data = await response.json();
-                
+
                 if (response.ok && data.data && data.data.length > 0) {
                     showStatus(`Loaded ${data.count} timetable entries. ✅`, 'success');
                     displayTimetableTable(data.data);
@@ -318,11 +321,11 @@
         async function viewData(type) {
             showStatus(`Loading ${type} data... ⏳`, 'info');
             document.getElementById('results').innerHTML = '<div class="loading">Loading data...</div>';
-            
+
             try {
                 const response = await fetch(`${API_URL}/${type}`);
                 const data = await response.json();
-                
+
                 if (response.ok) {
                     showStatus(`Loaded ${data.count} ${type} records. ✅`, 'success');
                     displayJSON(data);
@@ -340,15 +343,15 @@
             if (!confirm('Are you sure you want to clear all timetable entries?')) {
                 return;
             }
-            
+
             showStatus('Clearing timetable... ⏳', 'info');
-            
+
             try {
                 const response = await fetch(`${API_URL}/timetable`, {
                     method: 'DELETE'
                 });
                 const data = await response.json();
-                
+
                 if (response.ok) {
                     showStatus('Timetable cleared successfully! ✅', 'success');
                     document.getElementById('results').innerHTML = '';
@@ -369,18 +372,18 @@
             let html = '<div class="timetable-grid"><table>';
             html += '<thead><tr><th>Section</th><th>Course</th><th>Faculty</th><th>Room</th><th>Day</th><th>Slot</th></tr></thead>';
             html += '<tbody>';
-            
+
             entries.forEach(entry => {
                 html += `<tr>
                     <td>${entry.sectionId?.name || 'N/A'}</td>
                     <td>${entry.courseId?.name || 'N/A'} (${entry.courseId?.courseType || 'N/A'})</td>
                     <td>${entry.facultyId?.name || 'N/A'}</td>
-                    <td>Room ${entry.roomId?._id?.toString().slice(-4) || 'N/A'} (${entry.roomId?.roomType || 'N/A'})</td>
+                    <td>${entry.roomId?.name || ('Room ' + entry.roomId?._id?.toString().slice(-4))} (${entry.roomId?.roomType || 'N/A'})</td>
                     <td>${entry.timeslotId?.day || 'N/A'}</td>
                     <td>Slot ${entry.timeslotId?.slot || 'N/A'}</td>
                 </tr>`;
             });
-            
+
             html += '</tbody></table></div>';
             document.getElementById('results').innerHTML = html;
         }
@@ -389,4 +392,5 @@
         checkServerStatus();
     </script>
 </body>
+
 </html>

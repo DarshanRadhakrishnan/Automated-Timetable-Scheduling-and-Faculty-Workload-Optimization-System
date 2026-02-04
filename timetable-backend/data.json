@@ -1,0 +1,1676 @@
+{
+  "metadata": {
+    "institution": "Amrita Vishwa Vidyapeetham",
+    "campus": "Coimbatore",
+    "academic_year": "2024-2025",
+    "semester": "Odd Semester (Semester V)",
+    "department": "CSE - Computer Science and Engineering",
+    "data_source": "Extracted from BTech CSE Section A & B, Lab timetables, and Academic Calendar"
+  },
+  "time_slots": {
+    "slot_definitions": [
+      {
+        "slot_id": 1,
+        "start_time": "08:00",
+        "end_time": "08:50",
+        "duration_minutes": 50
+      },
+      {
+        "slot_id": 2,
+        "start_time": "08:50",
+        "end_time": "09:40",
+        "duration_minutes": 50
+      },
+      {
+        "slot_id": 3,
+        "start_time": "09:40",
+        "end_time": "10:30",
+        "duration_minutes": 50
+      },
+      {
+        "slot_id": "INTERVAL",
+        "start_time": "10:30",
+        "end_time": "10:45",
+        "duration_minutes": 15,
+        "type": "break"
+      },
+      {
+        "slot_id": 4,
+        "start_time": "10:45",
+        "end_time": "11:35",
+        "duration_minutes": 50
+      },
+      {
+        "slot_id": 5,
+        "start_time": "11:35",
+        "end_time": "12:25",
+        "duration_minutes": 50
+      },
+      {
+        "slot_id": 6,
+        "start_time": "12:25",
+        "end_time": "13:15",
+        "duration_minutes": 50
+      },
+      {
+        "slot_id": "LUNCH",
+        "start_time": "13:15",
+        "end_time": "14:05",
+        "duration_minutes": 50,
+        "type": "break"
+      },
+      {
+        "slot_id": 7,
+        "start_time": "14:05",
+        "end_time": "14:55",
+        "duration_minutes": 50
+      },
+      {
+        "slot_id": 8,
+        "start_time": "14:55",
+        "end_time": "15:45",
+        "duration_minutes": 50
+      },
+      {
+        "slot_id": 9,
+        "start_time": "15:45",
+        "end_time": "16:35",
+        "duration_minutes": 50
+      },
+      {
+        "slot_id": 10,
+        "start_time": "16:35",
+        "end_time": "17:25",
+        "duration_minutes": 50
+      },
+      {
+        "slot_id": 11,
+        "start_time": "17:25",
+        "end_time": "18:15",
+        "duration_minutes": 50
+      }
+    ],
+    "lab_slot_combinations": {
+      "description": "Labs require 3 consecutive slots (150 minutes)",
+      "valid_combinations": [
+        [
+          1,
+          2,
+          3
+        ],
+        [
+          4,
+          5,
+          6
+        ],
+        [
+          7,
+          8,
+          9
+        ],
+        [
+          8,
+          9,
+          10
+        ],
+        [
+          9,
+          10,
+          11
+        ]
+      ]
+    }
+  },
+  "faculty_data": [
+    {
+      "faculty_id": "F001",
+      "name": "Dr. V Ananthanarayanan",
+      "designation": "Professor",
+      "department": "CSE",
+      "email": "v_ananthanarayanan@cb.amrita.edu",
+      "competency_mapping": [
+        "23CSE301",
+        "Computer Networks"
+      ],
+      "current_courses": [
+        {
+          "course_code": "23CSE301",
+          "sections": [
+            "A"
+          ],
+          "type": "Theory"
+        },
+        {
+          "course_code": "23CSE302",
+          "sections": [
+            "A"
+          ],
+          "type": "Tutorial"
+        }
+      ],
+      "workload": {
+        "lecture_hours": 3,
+        "tutorial_hours": 1,
+        "lab_hours": 0,
+        "total": 4
+      },
+      "constraints": []
+    },
+    {
+      "faculty_id": "F002",
+      "name": "Ms. P. Malathi",
+      "designation": "Assistant Professor",
+      "department": "CSE",
+      "email": "p_malathi@cb.amrita.edu",
+      "competency_mapping": [
+        "23CSE303",
+        "Theory of Computation",
+        "Machine Learning"
+      ],
+      "current_courses": [
+        {
+          "course_code": "23CSE303",
+          "sections": [
+            "A"
+          ],
+          "type": "Theory"
+        },
+        {
+          "course_code": "23CSE301",
+          "sections": [
+            "B"
+          ],
+          "type": "Lab - Assisting"
+        }
+      ],
+      "workload": {
+        "lecture_hours": 3,
+        "tutorial_hours": 0,
+        "lab_hours": 3,
+        "total": 6
+      },
+      "constraints": [],
+      "role": "Class Advisor - Section A"
+    },
+    {
+      "faculty_id": "F003",
+      "name": "Dr. A. Baskar",
+      "designation": "Associate Professor",
+      "department": "CSE",
+      "email": "a_baskar@cb.amrita.edu",
+      "competency_mapping": [
+        "23CSE304",
+        "Embedded Systems"
+      ],
+      "current_courses": [
+        {
+          "course_code": "23CSE304",
+          "sections": [
+            "A"
+          ],
+          "type": "Theory"
+        },
+        {
+          "course_code": "23CSE304",
+          "sections": [
+            "A"
+          ],
+          "type": "Lab - Incharge"
+        },
+        {
+          "course_code": "23CSE301",
+          "sections": [
+            "B"
+          ],
+          "type": "Lab - Assisting"
+        }
+      ],
+      "workload": {
+        "lecture_hours": 3,
+        "tutorial_hours": 0,
+        "lab_hours": 6,
+        "total": 9
+      },
+      "constraints": []
+    },
+    {
+      "faculty_id": "F004",
+      "name": "Ms. Divya Singh",
+      "designation": "Assistant Professor",
+      "department": "CSE",
+      "email": "divya_singh@cb.amrita.edu",
+      "competency_mapping": [
+        "23CSE302",
+        "Machine Learning"
+      ],
+      "current_courses": [
+        {
+          "course_code": "23CSE302",
+          "sections": [
+            "A"
+          ],
+          "type": "Theory"
+        },
+        {
+          "course_code": "23CSE302",
+          "sections": [
+            "A"
+          ],
+          "type": "Lab - Incharge"
+        }
+      ],
+      "co_teaching": {
+        "with": "Dr. Sudhir Kumar Patnaik",
+        "course": "23CSE302"
+      },
+      "workload": {
+        "lecture_hours": 3,
+        "tutorial_hours": 0,
+        "lab_hours": 3,
+        "total": 6
+      },
+      "constraints": []
+    },
+    {
+      "faculty_id": "F005",
+      "name": "Dr. Vishnuvarthan R",
+      "designation": "Assistant Professor",
+      "department": "CSE",
+      "email": "r_vishnuvarthan@cb.amrita.edu",
+      "competency_mapping": [
+        "Edge Computing"
+      ],
+      "current_courses": [
+        {
+          "course_code": "23CSE362",
+          "sections": [
+            "A-G2"
+          ],
+          "type": "Lab - Edge Computing"
+        }
+      ],
+      "workload": {
+        "lecture_hours": 0,
+        "tutorial_hours": 0,
+        "lab_hours": 3,
+        "total": 3
+      },
+      "constraints": [],
+      "role": "Class Advisor - Section A"
+    },
+    {
+      "faculty_id": "F006",
+      "name": "Ms. E. Kuladevy",
+      "designation": "Assistant Professor",
+      "department": "CSE",
+      "competency_mapping": [
+        "Verification",
+        "Life Skills"
+      ],
+      "current_courses": [
+        {
+          "course_code": "23LSE301",
+          "sections": [
+            "A",
+            "B"
+          ],
+          "type": "Life Skills"
+        }
+      ],
+      "workload": {
+        "lecture_hours": 1,
+        "tutorial_hours": 0,
+        "lab_hours": 0,
+        "total": 1
+      },
+      "constraints": []
+    },
+    {
+      "faculty_id": "F007",
+      "name": "Dr. Raghu Pradeep Nair",
+      "designation": "Associate Professor",
+      "department": "CSE",
+      "competency_mapping": [
+        "System Software"
+      ],
+      "workload": {
+        "lecture_hours": 0,
+        "tutorial_hours": 0,
+        "lab_hours": 0,
+        "total": 0
+      },
+      "constraints": []
+    },
+    {
+      "faculty_id": "F008",
+      "name": "Ms. Anitha M",
+      "designation": "Assistant Professor",
+      "department": "CSE",
+      "competency_mapping": [
+        "Advanced Programming Techniques"
+      ],
+      "workload": {
+        "lecture_hours": 0,
+        "tutorial_hours": 0,
+        "lab_hours": 0,
+        "total": 0
+      },
+      "constraints": []
+    },
+    {
+      "faculty_id": "F009",
+      "name": "Dr. Nikhil Raj P",
+      "designation": "Assistant Professor",
+      "department": "Environmental Science",
+      "competency_mapping": [
+        "23ENV300",
+        "Environmental Science"
+      ],
+      "current_courses": [
+        {
+          "course_code": "23ENV300",
+          "sections": [
+            "A",
+            "B"
+          ],
+          "type": "Online"
+        }
+      ],
+      "workload": {
+        "lecture_hours": 0,
+        "tutorial_hours": 0,
+        "lab_hours": 0,
+        "total": 0
+      },
+      "constraints": []
+    },
+    {
+      "faculty_id": "F010",
+      "name": "Mr. Sumesh A K",
+      "designation": "Assistant Professor",
+      "department": "CSE",
+      "email": "sumesh_ak@cb.amrita.edu",
+      "competency_mapping": [
+        "23CSE301",
+        "Computer Networks"
+      ],
+      "current_courses": [
+        {
+          "course_code": "23CSE301",
+          "sections": [
+            "B"
+          ],
+          "type": "Theory"
+        },
+        {
+          "course_code": "23CSE301",
+          "sections": [
+            "B"
+          ],
+          "type": "Lab - Incharge"
+        }
+      ],
+      "workload": {
+        "lecture_hours": 3,
+        "tutorial_hours": 0,
+        "lab_hours": 3,
+        "total": 6
+      },
+      "constraints": []
+    },
+    {
+      "faculty_id": "F011",
+      "name": "Dr. Swapna T R",
+      "designation": "Associate Professor",
+      "department": "CSE",
+      "competency_mapping": [
+        "23CSE303",
+        "Theory of Computation"
+      ],
+      "current_courses": [
+        {
+          "course_code": "23CSE303",
+          "sections": [
+            "B"
+          ],
+          "type": "Theory"
+        }
+      ],
+      "workload": {
+        "lecture_hours": 3,
+        "tutorial_hours": 0,
+        "lab_hours": 0,
+        "total": 3
+      },
+      "constraints": []
+    },
+    {
+      "faculty_id": "F012",
+      "name": "Dr. Thangavelu S",
+      "designation": "Associate Professor",
+      "department": "CSE",
+      "competency_mapping": [
+        "23CSE304",
+        "Embedded Systems"
+      ],
+      "current_courses": [
+        {
+          "course_code": "23CSE304",
+          "sections": [
+            "B"
+          ],
+          "type": "Theory"
+        },
+        {
+          "course_code": "23CSE304",
+          "sections": [
+            "B"
+          ],
+          "type": "Lab - Incharge"
+        }
+      ],
+      "workload": {
+        "lecture_hours": 3,
+        "tutorial_hours": 0,
+        "lab_hours": 3,
+        "total": 6
+      },
+      "constraints": []
+    },
+    {
+      "faculty_id": "F013",
+      "name": "Dr. M. Anbazhagan",
+      "designation": "Associate Professor",
+      "department": "CSE",
+      "competency_mapping": [
+        "23CSE302",
+        "Machine Learning"
+      ],
+      "current_courses": [
+        {
+          "course_code": "23CSE302",
+          "sections": [
+            "B"
+          ],
+          "type": "Theory"
+        },
+        {
+          "course_code": "23CSE302",
+          "sections": [
+            "B"
+          ],
+          "type": "Lab - Incharge"
+        }
+      ],
+      "co_teaching": {
+        "with": "Ms. P. Malathi",
+        "course": "23CSE302"
+      },
+      "workload": {
+        "lecture_hours": 3,
+        "tutorial_hours": 0,
+        "lab_hours": 3,
+        "total": 6
+      },
+      "constraints": []
+    },
+    {
+      "faculty_id": "F014",
+      "name": "Mr. V. Dayanand",
+      "designation": "Assistant Professor",
+      "department": "CSE",
+      "email": "v_dayanand@cb.amrita.edu",
+      "competency_mapping": [
+        "Data Visualization",
+        "OOP"
+      ],
+      "current_courses": [
+        {
+          "course_code": "23CSE353",
+          "sections": [
+            "A",
+            "B"
+          ],
+          "type": "PE2 - Data Visualization"
+        },
+        {
+          "course_code": "23CSE111",
+          "sections": [
+            "B"
+          ],
+          "type": "Lab - OOP"
+        }
+      ],
+      "workload": {
+        "lecture_hours": 3,
+        "tutorial_hours": 0,
+        "lab_hours": 3,
+        "total": 6
+      },
+      "constraints": [],
+      "role": "Class Advisor - Section B"
+    },
+    {
+      "faculty_id": "F015",
+      "name": "Dr. Ramraj T",
+      "designation": "Associate Professor",
+      "department": "CSE",
+      "email": "t_ramraj@cb.amrita.edu",
+      "competency_mapping": [],
+      "workload": {
+        "lecture_hours": 0,
+        "tutorial_hours": 0,
+        "lab_hours": 0,
+        "total": 0
+      },
+      "constraints": [],
+      "role": "Class Advisor - Section B"
+    },
+    {
+      "faculty_id": "F016",
+      "name": "Ms. Bindu K R",
+      "designation": "Assistant Professor",
+      "department": "CSE",
+      "competency_mapping": [
+        "Natural Language Processing",
+        "Computer Networks",
+        "UI Design"
+      ],
+      "current_courses": [
+        {
+          "course_code": "23CSE461",
+          "sections": [
+            "PE1"
+          ],
+          "type": "NLP"
+        },
+        {
+          "course_code": "23CSE301",
+          "sections": [
+            "A"
+          ],
+          "type": "Lab - Assisting"
+        },
+        {
+          "course_code": "23CSE113",
+          "sections": [
+            "C"
+          ],
+          "type": "Lab - UI Design"
+        }
+      ],
+      "workload": {
+        "lecture_hours": 3,
+        "tutorial_hours": 0,
+        "lab_hours": 6,
+        "total": 9
+      },
+      "constraints": []
+    },
+    {
+      "faculty_id": "F017",
+      "name": "Ms. Nayana",
+      "designation": "Assistant Professor",
+      "department": "CSE",
+      "competency_mapping": [
+        "Computer Networks",
+        "Embedded Systems"
+      ],
+      "current_courses": [
+        {
+          "course_code": "23CSE301",
+          "sections": [
+            "A"
+          ],
+          "type": "Lab - Assisting"
+        },
+        {
+          "course_code": "23CSE304",
+          "sections": [
+            "A"
+          ],
+          "type": "Lab - Assisting"
+        }
+      ],
+      "workload": {
+        "lecture_hours": 0,
+        "tutorial_hours": 0,
+        "lab_hours": 6,
+        "total": 6
+      },
+      "constraints": []
+    },
+    {
+      "faculty_id": "F018",
+      "name": "Ms. D. Bharathi",
+      "designation": "Assistant Professor",
+      "department": "CSE",
+      "competency_mapping": [
+        "Embedded Systems"
+      ],
+      "current_courses": [
+        {
+          "course_code": "23CSE304",
+          "sections": [
+            "A"
+          ],
+          "type": "Lab - Assisting"
+        }
+      ],
+      "workload": {
+        "lecture_hours": 0,
+        "tutorial_hours": 0,
+        "lab_hours": 3,
+        "total": 3
+      },
+      "constraints": []
+    },
+    {
+      "faculty_id": "F019",
+      "name": "Dr. T. Senthil Kumar",
+      "designation": "Associate Professor",
+      "department": "CSE",
+      "competency_mapping": [
+        "Full Stack Frameworks",
+        "Computer Networks",
+        "OOP"
+      ],
+      "current_courses": [
+        {
+          "course_code": "23CSE472",
+          "sections": [
+            "PE1"
+          ],
+          "type": "Full Stack"
+        },
+        {
+          "course_code": "23CSE301",
+          "sections": [
+            "B"
+          ],
+          "type": "Lab - Assisting"
+        },
+        {
+          "course_code": "23CSE111",
+          "sections": [
+            "B"
+          ],
+          "type": "Lab - OOP"
+        }
+      ],
+      "workload": {
+        "lecture_hours": 3,
+        "tutorial_hours": 0,
+        "lab_hours": 6,
+        "total": 9
+      },
+      "constraints": []
+    },
+    {
+      "faculty_id": "F020",
+      "name": "Mr. Vedaj J. Padman",
+      "designation": "Assistant Professor",
+      "department": "CSE",
+      "competency_mapping": [
+        "Embedded Systems"
+      ],
+      "current_courses": [
+        {
+          "course_code": "23CSE304",
+          "sections": [
+            "B"
+          ],
+          "type": "Lab - Assisting"
+        }
+      ],
+      "workload": {
+        "lecture_hours": 0,
+        "tutorial_hours": 0,
+        "lab_hours": 3,
+        "total": 3
+      },
+      "constraints": []
+    },
+    {
+      "faculty_id": "F021",
+      "name": "Ms. G. Radhika",
+      "designation": "Assistant Professor",
+      "department": "CSE",
+      "competency_mapping": [
+        "Mobile Application Development",
+        "Embedded Systems"
+      ],
+      "current_courses": [
+        {
+          "course_code": "23CSE455",
+          "sections": [
+            "PE2"
+          ],
+          "type": "Mobile App Dev"
+        },
+        {
+          "course_code": "23CSE304",
+          "sections": [
+            "B"
+          ],
+          "type": "Lab - Assisting"
+        }
+      ],
+      "workload": {
+        "lecture_hours": 3,
+        "tutorial_hours": 0,
+        "lab_hours": 3,
+        "total": 6
+      },
+      "constraints": []
+    }
+  ],
+  "course_catalog": [
+    {
+      "course_code": "23CSE301",
+      "course_name": "Computer Networks",
+      "department": "CSE",
+      "semester": 5,
+      "credits": {
+        "L": 3,
+        "T": 0,
+        "P": 0,
+        "total": 3
+      },
+      "hours_per_week": {
+        "lecture": 3,
+        "tutorial": 0,
+        "lab": 0
+      },
+      "course_type": "Core Theory",
+      "sections_offered": [
+        "A",
+        "B"
+      ],
+      "faculty_assigned": {
+        "A": {
+          "theory": "Dr. V Ananthanarayanan",
+          "lab": "Dr. V Ananthanarayanan"
+        },
+        "B": {
+          "theory": "Mr. Sumesh A K",
+          "lab": "Mr. Sumesh A K"
+        }
+      },
+      "lab_required": true,
+      "lab_duration_slots": 3,
+      "prerequisites": []
+    },
+    {
+      "course_code": "23CSE302",
+      "course_name": "Machine Learning",
+      "department": "CSE",
+      "semester": 5,
+      "credits": {
+        "L": 3,
+        "T": 0,
+        "P": 0,
+        "total": 3
+      },
+      "hours_per_week": {
+        "lecture": 3,
+        "tutorial": 1,
+        "lab": 0
+      },
+      "course_type": "Core Theory",
+      "sections_offered": [
+        "A",
+        "B"
+      ],
+      "faculty_assigned": {
+        "A": {
+          "theory": "Ms. Divya Singh",
+          "lab": "Ms. Divya Singh",
+          "co_teaching": "Dr. Sudhir Kumar Patnaik"
+        },
+        "B": {
+          "theory": "Dr. M. Anbazhagan",
+          "lab": "Dr. M. Anbazhagan",
+          "co_teaching": "Ms. P. Malathi"
+        }
+      },
+      "lab_required": true,
+      "lab_duration_slots": 3,
+      "tutorial_required": true,
+      "prerequisites": []
+    },
+    {
+      "course_code": "23CSE303",
+      "course_name": "Theory of Computation",
+      "department": "CSE",
+      "semester": 5,
+      "credits": {
+        "L": 3,
+        "T": 0,
+        "P": 0,
+        "total": 3
+      },
+      "hours_per_week": {
+        "lecture": 3,
+        "tutorial": 0,
+        "lab": 0
+      },
+      "course_type": "Core Theory",
+      "sections_offered": [
+        "A",
+        "B"
+      ],
+      "faculty_assigned": {
+        "A": {
+          "theory": "Ms. P. Malathi"
+        },
+        "B": {
+          "theory": "Dr. Swapna T R"
+        }
+      },
+      "lab_required": false,
+      "prerequisites": []
+    },
+    {
+      "course_code": "23CSE304",
+      "course_name": "Embedded Systems",
+      "department": "CSE",
+      "semester": 5,
+      "credits": {
+        "L": 3,
+        "T": 0,
+        "P": 0,
+        "total": 3
+      },
+      "hours_per_week": {
+        "lecture": 3,
+        "tutorial": 0,
+        "lab": 0
+      },
+      "course_type": "Core Theory",
+      "sections_offered": [
+        "A",
+        "B"
+      ],
+      "faculty_assigned": {
+        "A": {
+          "theory": "Dr. A. Baskar",
+          "lab": "Dr. A. Baskar"
+        },
+        "B": {
+          "theory": "Dr. Thangavelu S",
+          "lab": "Dr. Thangavelu S"
+        }
+      },
+      "lab_required": true,
+      "lab_duration_slots": 3,
+      "prerequisites": []
+    },
+    {
+      "course_code": "23LSE301",
+      "course_name": "Life Skills for Engineers III",
+      "department": "General",
+      "semester": 5,
+      "credits": {
+        "L": 1,
+        "T": 0,
+        "P": 0,
+        "total": 1
+      },
+      "hours_per_week": {
+        "lecture": 1,
+        "tutorial": 0,
+        "lab": 0
+      },
+      "course_type": "General",
+      "sections_offered": [
+        "A",
+        "B"
+      ],
+      "faculty_assigned": {
+        "A": {
+          "theory": "Ms. E. Kuladevy"
+        },
+        "B": {
+          "theory": "Ms. E. Kuladevy"
+        }
+      },
+      "lab_required": false,
+      "prerequisites": []
+    },
+    {
+      "course_code": "23ENV300",
+      "course_name": "Environmental Science",
+      "department": "General",
+      "semester": 5,
+      "credits": {
+        "L": 0,
+        "T": 0,
+        "P": 0,
+        "total": 0
+      },
+      "hours_per_week": {
+        "lecture": 0,
+        "tutorial": 0,
+        "lab": 0
+      },
+      "course_type": "Online",
+      "sections_offered": [
+        "A",
+        "B"
+      ],
+      "faculty_assigned": {
+        "A": {
+          "theory": "Dr. Nikhil Raj P"
+        },
+        "B": {
+          "theory": "Dr. Nikhil Raj P"
+        }
+      },
+      "delivery_mode": "Online",
+      "lab_required": false,
+      "prerequisites": []
+    },
+    {
+      "course_code": "23LIV390",
+      "course_name": "Live-in Labs I",
+      "department": "CSE",
+      "semester": 5,
+      "credits": {
+        "L": 0,
+        "T": 0,
+        "P": 0,
+        "total": 0
+      },
+      "hours_per_week": {
+        "lecture": 0,
+        "tutorial": 0,
+        "lab": 0
+      },
+      "course_type": "Experiential",
+      "sections_offered": [
+        "A",
+        "B"
+      ],
+      "lab_required": false,
+      "note": "Off-campus experiential learning",
+      "prerequisites": []
+    }
+  ],
+  "professional_electives": {
+    "PE1": [
+      {
+        "course_code": "23CSE331",
+        "course_name": "Computer Graphics and Animation",
+        "faculty": "N Harini",
+        "venue": "ABIII-A205"
+      },
+      {
+        "course_code": "23CSE351",
+        "course_name": "Block chain and its Applications",
+        "faculty": "Dr. Uma J",
+        "venue": "ABIII-C203"
+      },
+      {
+        "course_code": "23CSE335",
+        "course_name": "Artificial Intelligence and Robotics",
+        "faculty": "Dr. C Shunmuga Velayutham",
+        "venue": "ABIII-C204/Active Learning Hall"
+      },
+      {
+        "course_code": "23CSE472",
+        "course_name": "Digital Image Processing",
+        "faculty": "Dr. Sruthi C. J.",
+        "venue": "ABIII-C205"
+      },
+      {
+        "course_code": "23CSE371",
+        "course_name": "Cryptography",
+        "faculty": "Dr. Pooja Mishra",
+        "venue": "ABIII-F401"
+      },
+      {
+        "course_code": "23CSE372",
+        "course_name": "Foundations of Data Science",
+        "faculty": "Dr PN Kumar",
+        "venue": "ABIII-A104/D404/D406"
+      },
+      {
+        "course_code": "23CSE471",
+        "course_name": "Natural Language Processing",
+        "faculty": "Dr. C. Santhosh Kumar",
+        "venue": "ABIII-A203"
+      },
+      {
+        "course_code": "23CSE461",
+        "course_name": "Blockchain Technology",
+        "faculty": "Mr. Ramaguru R",
+        "venue": "ABIII-C302/Active Learning Hall"
+      },
+      {
+        "course_code": "20CYS432",
+        "course_name": "Renewable Energy Resources and systems",
+        "faculty": "Dr. Duraisamy Kumaresan",
+        "venue": "ABIII-SF-F301"
+      },
+      {
+        "course_code": "24CYS336",
+        "course_name": "Fundamentals of Soft Computing",
+        "faculty": "Dr. KRM Vijayachandrakala",
+        "venue": "ABIII-SF-F301"
+      },
+      {
+        "course_code": "23CHE363",
+        "course_name": "Natural Language Processing",
+        "faculty": "Ms. Bindu K R",
+        "venue": "ABII-M.Tech Classroom"
+      },
+      {
+        "course_code": "19CSE362",
+        "course_name": "Full Stack Frameworks",
+        "faculty": "Dr. T.Senthil Kumar",
+        "venue": "ABII-A403"
+      },
+      {
+        "course_code": "23ECE444",
+        "course_name": "Vulnerability Assessment and Penetration Testing",
+        "faculty": "Mr. Akhil K J",
+        "venue": "ABII-C305/A302"
+      }
+    ],
+    "PE2": [
+      {
+        "course_code": "23CSE353",
+        "course_name": "Data Visualization",
+        "faculty": "Mr. Dayanand V",
+        "venue": "ABIII-A205"
+      },
+      {
+        "course_code": "23CSE373",
+        "course_name": "Mobile Application Development",
+        "faculty": "Ms. Radhika G",
+        "venue": "ABIII-C203"
+      },
+      {
+        "course_code": "23CSE362",
+        "course_name": "Edge Computing",
+        "faculty": "Dr. Ritwik M (G1) / Dr. Vishnuvarthan R (G2)",
+        "venue": "ABIII-C204/C103/C205"
+      },
+      {
+        "course_code": "23CSE455",
+        "course_name": "Computational Intelligence",
+        "faculty": "Dr. Dhanya M. Dhanalakshmy",
+        "venue": "ABIII-F401"
+      },
+      {
+        "course_code": "23CSE463",
+        "course_name": "Deep Learning",
+        "faculty": "Dr. T Ananthan",
+        "venue": "ABIII-A203"
+      },
+      {
+        "course_code": "23CSE465",
+        "course_name": "Design Patterns",
+        "faculty": "Dr Lalithamani Nithyanandham",
+        "venue": "ABIII-C302"
+      },
+      {
+        "course_code": "23CSE474",
+        "course_name": "Quantum Computing",
+        "faculty": "Dr. B. Rajathilagam",
+        "venue": "ABIII-D404/A104/D406"
+      },
+      {
+        "course_code": "23ELC364",
+        "course_name": "Computer Vision",
+        "faculty": "Ms. R.Manjusha",
+        "venue": "ABII-C205"
+      }
+    ]
+  },
+  "student_sections": [
+    {
+      "section_id": "CSE-5A",
+      "department": "CSE",
+      "semester": 5,
+      "year": 3,
+      "total_students": 60,
+      "class_advisors": [
+        "Ms. P. Malathi",
+        "Dr. Vishnuvarthan R"
+      ],
+      "home_room": "ABIII-A205",
+      "lab_batches": {
+        "23CSE301": {
+          "batch_count": 1,
+          "students_per_batch": 60
+        },
+        "23CSE302": {
+          "batch_count": 1,
+          "students_per_batch": 60
+        },
+        "23CSE304": {
+          "batch_count": 1,
+          "students_per_batch": 60
+        }
+      }
+    },
+    {
+      "section_id": "CSE-5B",
+      "department": "CSE",
+      "semester": 5,
+      "year": 3,
+      "total_students": 60,
+      "class_advisors": [
+        "Mr. V. Dayanand",
+        "Dr. Ramraj T"
+      ],
+      "home_room": "ABIII-C203",
+      "lab_batches": {
+        "23CSE301": {
+          "batch_count": 1,
+          "students_per_batch": 60
+        },
+        "23CSE302": {
+          "batch_count": 1,
+          "students_per_batch": 60
+        },
+        "23CSE304": {
+          "batch_count": 1,
+          "students_per_batch": 60
+        }
+      }
+    }
+  ],
+  "infrastructure": {
+    "buildings": [
+      {
+        "building_id": "ABIII",
+        "building_name": "Academic Block III",
+        "floors": 4,
+        "rooms": [
+          {
+            "room_id": "A205",
+            "floor": 2,
+            "type": "Theory Classroom",
+            "capacity": 70,
+            "equipment": [
+              "Projector",
+              "Whiteboard",
+              "AC"
+            ]
+          },
+          {
+            "room_id": "C203",
+            "floor": 2,
+            "type": "Theory Classroom",
+            "capacity": 70,
+            "equipment": [
+              "Projector",
+              "Whiteboard",
+              "AC"
+            ]
+          },
+          {
+            "room_id": "C204",
+            "floor": 2,
+            "type": "Theory Classroom",
+            "capacity": 70,
+            "equipment": [
+              "Projector",
+              "Whiteboard",
+              "AC"
+            ]
+          },
+          {
+            "room_id": "C205",
+            "floor": 2,
+            "type": "Theory Classroom",
+            "capacity": 70,
+            "equipment": [
+              "Projector",
+              "Whiteboard",
+              "AC"
+            ]
+          },
+          {
+            "room_id": "A203",
+            "floor": 2,
+            "type": "Theory Classroom",
+            "capacity": 70,
+            "equipment": [
+              "Projector",
+              "Whiteboard",
+              "AC"
+            ]
+          },
+          {
+            "room_id": "F401",
+            "floor": 4,
+            "type": "Theory Classroom",
+            "capacity": 70,
+            "equipment": [
+              "Projector",
+              "Whiteboard",
+              "AC"
+            ]
+          },
+          {
+            "room_id": "C302",
+            "floor": 3,
+            "type": "Theory Classroom",
+            "capacity": 70,
+            "equipment": [
+              "Projector",
+              "Whiteboard",
+              "AC"
+            ]
+          },
+          {
+            "room_id": "Active Learning Hall",
+            "floor": null,
+            "type": "Special Classroom",
+            "capacity": 100,
+            "equipment": [
+              "Smart Board",
+              "Interactive Display"
+            ]
+          },
+          {
+            "room_id": "SF-HW Lab",
+            "floor": null,
+            "type": "Hardware Lab",
+            "capacity": 40,
+            "equipment": [
+              "Hardware Kits",
+              "Embedded Systems"
+            ],
+            "lab_type": "Hardware"
+          },
+          {
+            "room_id": "TF-CP Lab 1 (A402)",
+            "floor": 4,
+            "type": "Computer Lab",
+            "capacity": 72,
+            "equipment": [
+              "Computers",
+              "Projector"
+            ],
+            "lab_type": "Programming"
+          },
+          {
+            "room_id": "TF-CP Lab 2 (A404)",
+            "floor": 4,
+            "type": "Computer Lab",
+            "capacity": 72,
+            "equipment": [
+              "Computers",
+              "Projector"
+            ],
+            "lab_type": "Programming"
+          },
+          {
+            "room_id": "SF-PG Lab",
+            "floor": null,
+            "type": "Postgraduate Lab",
+            "capacity": 40,
+            "equipment": [
+              "High-end Computers"
+            ],
+            "lab_type": "Research"
+          },
+          {
+            "room_id": "C303",
+            "floor": 3,
+            "type": "Hardware Lab",
+            "capacity": 40,
+            "equipment": [
+              "Hardware Kits"
+            ],
+            "lab_type": "Hardware"
+          }
+        ]
+      },
+      {
+        "building_id": "ABI",
+        "building_name": "Academic Block I",
+        "floors": 3,
+        "rooms": [
+          {
+            "room_id": "W-102",
+            "floor": 0,
+            "type": "Computer Lab",
+            "capacity": 72,
+            "equipment": [
+              "Thin Clients",
+              "Projector"
+            ],
+            "lab_type": "Programming"
+          }
+        ]
+      },
+      {
+        "building_id": "ABII",
+        "building_name": "Academic Block II",
+        "floors": 4,
+        "rooms": [
+          {
+            "room_id": "A403",
+            "floor": 4,
+            "type": "Theory Classroom",
+            "capacity": 70,
+            "equipment": [
+              "Projector",
+              "Whiteboard"
+            ]
+          },
+          {
+            "room_id": "C205",
+            "floor": 2,
+            "type": "Theory Classroom",
+            "capacity": 70,
+            "equipment": [
+              "Projector",
+              "Whiteboard"
+            ]
+          },
+          {
+            "room_id": "C305",
+            "floor": 3,
+            "type": "Theory Classroom",
+            "capacity": 70,
+            "equipment": [
+              "Projector",
+              "Whiteboard"
+            ]
+          },
+          {
+            "room_id": "A302",
+            "floor": 3,
+            "type": "Theory Classroom",
+            "capacity": 70,
+            "equipment": [
+              "Projector",
+              "Whiteboard"
+            ]
+          }
+        ]
+      }
+    ],
+    "special_labs": [
+      {
+        "lab_id": "SF-HW Lab",
+        "location": "ABIII",
+        "specialization": "Hardware/Embedded Systems",
+        "capacity": 40
+      },
+      {
+        "lab_id": "TF-CP Lab 1",
+        "location": "ABIII-A402",
+        "specialization": "Programming",
+        "capacity": 72
+      },
+      {
+        "lab_id": "TF-CP Lab 2",
+        "location": "ABIII-A404",
+        "specialization": "Programming",
+        "capacity": 72
+      },
+      {
+        "lab_id": "SF-PG Lab",
+        "location": "ABIII",
+        "specialization": "Postgraduate Research",
+        "capacity": 40
+      },
+      {
+        "lab_id": "SF-F301",
+        "location": "ABIII",
+        "specialization": "Cybersecurity",
+        "capacity": 40
+      },
+      {
+        "lab_id": "C303",
+        "location": "ABIII",
+        "specialization": "Hardware",
+        "capacity": 40
+      }
+    ]
+  },
+  "constraints": {
+    "hard_constraints": [
+      {
+        "constraint_id": "HC1",
+        "type": "Course Allocation",
+        "description": "Pre-assigned faculty must teach their designated courses to specified sections",
+        "example": "Dr. V Ananthanarayanan MUST teach 23CSE301 to Section A"
+      },
+      {
+        "constraint_id": "HC2",
+        "type": "Room Suitability",
+        "description": "Lab courses require lab rooms with appropriate equipment",
+        "rules": [
+          "Embedded Systems Lab → Hardware Lab (SF-HW Lab or C303)",
+          "Computer Networks Lab → Programming Lab (CP Lab 1/2)",
+          "Machine Learning Lab → Programming Lab (CP Lab 1/2)"
+        ]
+      },
+      {
+        "constraint_id": "HC3",
+        "type": "Workload Limits",
+        "description": "Faculty cannot exceed maximum contact hours per week",
+        "limits": {
+          "Professor": 18,
+          "Associate Professor": 18,
+          "Assistant Professor": 18
+        }
+      },
+      {
+        "constraint_id": "HC4",
+        "type": "No Conflicts",
+        "description": "Faculty/Room/Section cannot be double-booked at same time"
+      },
+      {
+        "constraint_id": "HC5",
+        "type": "Consecutive Lab Slots",
+        "description": "Lab sessions must occupy 3 consecutive slots without breaks",
+        "valid_combinations": [
+          [
+            1,
+            2,
+            3
+          ],
+          [
+            4,
+            5,
+            6
+          ],
+          [
+            7,
+            8,
+            9
+          ],
+          [
+            8,
+            9,
+            10
+          ],
+          [
+            9,
+            10,
+            11
+          ]
+        ]
+      },
+      {
+        "constraint_id": "HC6",
+        "type": "Tutorial After Theory",
+        "description": "Tutorial slots for 23CSE302 must be scheduled on specific days as indicated in timetable"
+      },
+      {
+        "constraint_id": "HC7",
+        "type": "Mentoring Sessions",
+        "description": "Mentoring sessions scheduled in faculty cabins, not classrooms"
+      },
+      {
+        "constraint_id": "HC8",
+        "type": "Alternate Timetables",
+        "description": "Some Saturdays follow different day timetables (e.g., Monday's, Tuesday's timetable)",
+        "examples": [
+          "Saturday with Monday's timetable",
+          "Saturday with Tuesday's timetable"
+        ]
+      }
+    ],
+    "soft_constraints": [
+      {
+        "constraint_id": "SC1",
+        "type": "Gap Minimization",
+        "description": "Students should have minimal free slots between classes",
+        "priority": "High",
+        "penalty": 10
+      },
+      {
+        "constraint_id": "SC2",
+        "type": "Lunch Break",
+        "description": "Ensure lunch break slot (Slot 7: 1:15 PM - 2:05 PM) is honored",
+        "priority": "Critical",
+        "penalty": 50
+      },
+      {
+        "constraint_id": "SC3",
+        "type": "Faculty Compactness",
+        "description": "Faculty prefer back-to-back classes over scattered schedule",
+        "priority": "Medium",
+        "penalty": 5
+      },
+      {
+        "constraint_id": "SC4",
+        "type": "Building Travel Time",
+        "description": "Avoid scheduling consecutive slots in different buildings",
+        "priority": "Medium",
+        "penalty": 8,
+        "buffer_slots": 1
+      },
+      {
+        "constraint_id": "SC5",
+        "type": "Morning Theory Preference",
+        "description": "Theory classes preferred in morning slots (1-6), labs in afternoon",
+        "priority": "Low",
+        "penalty": 2
+      },
+      {
+        "constraint_id": "SC6",
+        "type": "Same Room for Section",
+        "description": "Try to use home room for theory classes when possible",
+        "priority": "Low",
+        "penalty": 3
+      },
+      {
+        "constraint_id": "SC7",
+        "type": "Elective Slot Fixed",
+        "description": "Professional Electives have fixed slots (PE1, PE2) across sections",
+        "priority": "High",
+        "penalty": 20
+      },
+      {
+        "constraint_id": "SC8",
+        "type": "M.Tech Priority",
+        "description": "Some slots marked as 'Occupied M.Tech Class' - unavailable for B.Tech",
+        "priority": "Critical",
+        "penalty": 100
+      }
+    ]
+  },
+  "academic_calendar_key_dates": {
+    "semester_start": "2024-07-10",
+    "semester_end": "2024-11-05",
+    "mid_term_exam": {
+      "higher_semesters": "2024-09-02 to 2024-09-06",
+      "first_semester": "2024-09-17 to 2024-09-20"
+    },
+    "end_semester_exam": {
+      "higher_semesters": "2024-11-06 onwards",
+      "first_semester": "2024-11-13 onwards"
+    },
+    "class_days": 90,
+    "holidays": [
+      {
+        "date": "2024-07-17",
+        "occasion": "Muharam (RH)"
+      },
+      {
+        "date": "2024-08-15",
+        "occasion": "Independence Day"
+      },
+      {
+        "date": "2024-08-26",
+        "occasion": "Krishnajayanthi"
+      },
+      {
+        "date": "2024-09-07",
+        "occasion": "Vinayagar Chaturthi"
+      },
+      {
+        "date": "2024-09-16",
+        "occasion": "Milad-un-Nabi (RH)"
+      },
+      {
+        "date": "2024-10-02",
+        "occasion": "Gandhi Jayanti"
+      },
+      {
+        "date": "2024-10-11",
+        "occasion": "Ayudha Pooja"
+      },
+      {
+        "date": "2024-10-12",
+        "occasion": "Vijayadashami"
+      },
+      {
+        "date": "2024-10-17-19",
+        "occasion": "Anokha (Tech Fest)"
+      },
+      {
+        "date": "2024-10-31",
+        "occasion": "Diwali"
+      }
+    ],
+    "special_timetables": [
+      {
+        "date": "2024-07-13",
+        "follows": "Monday's Time Table"
+      },
+      {
+        "date": "2024-07-27",
+        "follows": "Tuesday's Time Table"
+      },
+      {
+        "date": "2024-08-10",
+        "follows": "Wednesday's Time Table"
+      },
+      {
+        "date": "2024-08-24",
+        "follows": "Thursday's Time Table"
+      },
+      {
+        "date": "2024-08-31",
+        "follows": "Friday's Time Table"
+      }
+    ]
+  },
+  "notes_and_assumptions": [
+    "Lab sessions require 3 consecutive 50-minute slots (total 150 minutes)",
+    "Tutorial sessions (T) for 23CSE302 are embedded in the timetable on specific days",
+    "Professional Electives (PE1 and PE2) have multiple course options; students choose one from each category",
+    "Co-teaching implies two faculty members share instruction responsibilities",
+    "Some courses like Environmental Science (23ENV300) are delivered online and don't require physical classroom slots",
+    "Mentoring sessions are scheduled in respective faculty cabins, not in regular classrooms",
+    "M.Tech classes occupy certain slots and take priority over B.Tech scheduling in those times",
+    "Saturday classes follow different day timetables on specific dates",
+    "Active Learning Hall is a special venue that can be used flexibly",
+    "Lab batches (G1, G2) indicate groups when sections are split for lab work",
+    "Class advisors have mentoring responsibilities in addition to teaching loads",
+    "Interval break is 15 minutes (10:30-10:45 AM), Lunch break is 50 minutes (1:15-2:05 PM)"
+  ]
+}
