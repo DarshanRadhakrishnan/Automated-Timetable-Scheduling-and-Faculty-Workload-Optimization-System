@@ -30,6 +30,7 @@ Automated-Timetable-Scheduling-and-Faculty-Workload-Optimization-System/
 - ✅ All CRUD routes
 - ✅ Timetable generation algorithm
 - ✅ Conflict detection
+- ✅ **Automatic conflict resolution**
 - ✅ Database seeding script
 
 ### Frontend ✅ COMPLETE
@@ -37,6 +38,8 @@ Automated-Timetable-Scheduling-and-Faculty-Workload-Optimization-System/
 - ✅ View all data (faculties, courses, rooms, sections, timeslots)
 - ✅ Generate timetable
 - ✅ View generated timetable
+- ✅ Detect conflicts
+- ✅ **Resolve conflicts automatically**
 - ✅ Clear timetable
 - ✅ Real-time statistics
 
@@ -224,7 +227,8 @@ curl -X DELETE http://localhost:5000/api/timetable
 - `GET /api/timetable/:id` - Get single timetable entry
 - `POST /api/timetable/generate` - Generate timetable
 - `DELETE /api/timetable` - Clear all timetable entries
-- `GET /api/timetable/conflicts/detect` - Detect conflicts
+- `POST /api/timetable/conflicts/detect` - Detect conflicts
+- `POST /api/timetable/conflicts/resolve` - **Automatically resolve conflicts**
 
 ## 🎨 Features
 
@@ -247,6 +251,23 @@ The system uses a **constraint satisfaction algorithm** that:
 - ✅ No faculty can teach two classes simultaneously
 - ✅ No room can host two classes simultaneously
 - ✅ No section can have two classes simultaneously
+
+### Automatic Conflict Resolution ✨ NEW
+The system now includes an **intelligent conflict resolution engine** that automatically fixes scheduling conflicts:
+
+**Resolution Strategies:**
+1. **Faculty Conflicts**: Reschedules classes to alternative timeslots where faculty is available
+2. **Room Conflicts**: Finds alternative rooms of the same type or reschedules to different timeslots
+3. **Section Conflicts**: Moves overlapping classes to free timeslots, changing rooms if necessary
+
+**How It Works:**
+- Click the "✨ Resolve Conflicts" button in the UI
+- System detects all conflicts automatically
+- Applies smart resolution strategies while maintaining all constraints
+- Shows detailed resolution log with actions taken
+- Displays conflict-free timetable automatically
+
+**See [CONFLICT_RESOLUTION.md](CONFLICT_RESOLUTION.md) for detailed documentation.**
 
 ## 🐛 Troubleshooting
 

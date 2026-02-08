@@ -8,6 +8,7 @@ const TimeSlot = require('../models/TimeSlot');
 const Timetable = require('../models/Timetable');
 const { generateTimetable } = require('../services/timetableGenerator');
 const { detectConflicts } = require('../services/conflictDetector');
+const { resolveConflicts } = require('../services/conflictResolver');
 
 // Generate timetable
 router.post('/generate', async (req, res) => {
@@ -174,6 +175,33 @@ router.post('/conflicts/detect', async (req, res) => {
     } catch (error) {
         res.status(500).json({
             message: 'Error detecting conflicts',
+            error: error.message,
+        });
+    }
+});
+
+// Resolve conflicts automatically
+// Supports ?proposalId=...
+router.post('/conflicts/resolve', async (req, res) => {
+    try {
+        const proposalId = req.query.proposalId || req.body.proposalId;
+
+        if (!proposalId) {
+            return res.status(400).json({
+                message: 'proposalId is required for conflict resolution'
+            });
+        }
+
+        const result = await resolveConflicts(proposalId);
+
+        res.json({
+            message: result.message,
+            success: result.success,
+            data: result
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error resolving conflicts',
             error: error.message,
         });
     }
