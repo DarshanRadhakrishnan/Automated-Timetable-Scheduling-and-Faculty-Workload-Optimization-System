@@ -5,6 +5,15 @@ const Section = require('../models/Section');
 const TimeSlot = require('../models/TimeSlot');
 const FacultyAvailability = require('../models/FacultyAvailability');
 
+// Helper to shuffle array for randomness
+const shuffleArray = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+};
+
 // Helper to check if a resource is busy
 const isBusy = async (field, id, timeslotId, proposalId) => {
     return await Timetable.exists({
@@ -80,7 +89,8 @@ const findSubstitutesForFaculty = async (facultyId, day, proposalId = 1) => {
         // 2. Section is FREE.
         // 3. Room is FREE (or find new room).
 
-        const allSlots = await TimeSlot.find({ day: { $ne: day } }); // Exclude the leave day
+        let allSlots = await TimeSlot.find({ day: { $ne: day } }); // Exclude the leave day
+        allSlots = shuffleArray(allSlots); // Randomize to avoid bias (e.g. always Monday)
         let potentialSlots = [];
 
         for (const slot of allSlots) {
@@ -190,7 +200,9 @@ const findAlternativeRooms = async (roomId, day, proposalId = 1) => {
         // So Strategy B is: Same Faculty/Section/Room, Diff Time (on a day where Room IS available).
         // OR Same Faculty/Section, Diff Time, New Room.
         // Let's just look for "Move this class to a free slot (Faculty+Section free)".
-        const allSlots = await TimeSlot.find({ day: { $ne: day } }); // Assume unavailable for whole day?
+        // Let's just look for "Move this class to a free slot (Faculty+Section free)".
+        let allSlots = await TimeSlot.find({ day: { $ne: day } }); // Assume unavailable for whole day?
+        allSlots = shuffleArray(allSlots); // Randomize
         // If unavailable for specific slots, we could check others on same day. 
         // But day input implies day closure.
 
@@ -243,7 +255,8 @@ const rescheduleHoliday = async (day, proposalId = 1) => {
 
     const results = [];
     // We want to find make-up slots for EVERY affected class
-    const allTimeSlots = await TimeSlot.find({ day: { $ne: day } });
+    let allTimeSlots = await TimeSlot.find({ day: { $ne: day } });
+    allTimeSlots = shuffleArray(allTimeSlots); // Randomize check order
 
     for (const classEntry of affectedClasses) {
         const potentialSlots = [];

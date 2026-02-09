@@ -66,13 +66,21 @@ router.post('/apply-changes', async (req, res) => {
 
         const results = [];
         for (const update of updates) {
-            const { entryId, changes } = update;
-            const updatedEntry = await Timetable.findByIdAndUpdate(
-                entryId,
-                { $set: changes },
-                { new: true }
-            );
-            results.push(updatedEntry);
+            const { entryId, changes, type } = update;
+
+            let result;
+            if (type === 'cancel') {
+                // Delete the entry
+                result = await Timetable.findByIdAndDelete(entryId);
+            } else {
+                // Update the entry
+                result = await Timetable.findByIdAndUpdate(
+                    entryId,
+                    { $set: changes },
+                    { new: true }
+                );
+            }
+            results.push(result);
         }
 
         res.json({
