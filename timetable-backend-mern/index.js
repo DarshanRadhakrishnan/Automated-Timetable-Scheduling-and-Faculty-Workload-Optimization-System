@@ -23,6 +23,7 @@ app.use('/api/availability', require('./routes/availability'));
 app.use('/api/timetable', require('./routes/timetable'));
 app.use('/api/conflicts', require('./conflicts'));
 app.use('/api/rescheduling', require('./routes/rescheduling'));
+app.use('/api/simulation', require('./routes/simulation'));
 
 // Health check
 app.get('/', (req, res) => {
