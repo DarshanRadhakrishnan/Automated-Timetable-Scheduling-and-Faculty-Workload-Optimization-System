@@ -210,6 +210,22 @@
                     Rescheduling</button>
                 <button onclick="clearTimetable()" class="secondary">🗑️ Clear Timetable</button>
 
+                <!-- EPIC 4: Simulation Features -->
+                <button onclick="facultyImpactAnalysis()"
+                    style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);">🧪 Faculty Impact
+                    Analysis</button>
+                <button onclick="roomShortageAnalysis()"
+                    style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">🏫 Room Shortage
+                    Analysis</button>
+                <button onclick="viewSimulationHistory()"
+                    style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">📊 View Simulation
+                    History</button>
+                <button onclick="compareScenarios()"
+                    style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">🔄 Compare Scenarios</button>
+                <button onclick="bulkFacultyAnalysis()"
+                    style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">📈 Bulk Faculty
+                    Analysis</button>
+
                 <div id="versionControl"
                     style="display:none; margin-left: auto; align-items: center; background: #f8f9fa; padding: 5px 15px; border-radius: 8px; border: 1px solid #ddd;">
                     <label style="margin-right: 10px; font-weight: 600; color: #667eea;">Select Plan:</label>
@@ -1263,6 +1279,733 @@
             } catch (error) {
                 showStatus(`Download failed: ${error.message}`, 'error');
             }
+        }
+
+        // ========================================
+        // EPIC 4: SIMULATION FEATURES
+        // ========================================
+
+        // Feature 1: Faculty Impact Analysis
+        async function facultyImpactAnalysis() {
+            // First, fetch and show faculty list
+            showStatus('Loading Faculty List... ⏳', 'info');
+            document.getElementById('results').innerHTML = '\u003cdiv class=\"loading\"\u003eLoading faculty list...\u003c/div\u003e';
+
+            try {
+                const response = await fetch(`${API_URL}/faculty`);
+                const data = await response.json();
+
+                if (response.ok && data.data) {
+                    showStatus('Select a faculty to analyze', 'info');
+
+                    let html = `
+                        \u003cdiv style=\"max-width: 1000px; margin: 0 auto;\"\u003e
+                            \u003ch2 style=\"color: #667eea; text-align: center; margin-bottom: 30px;\"\u003e🧪 Faculty Impact Analysis - Select Faculty\u003c/h2\u003e
+                            \u003cp style=\"text-align: center; color: #666; margin-bottom: 30px;\"\u003eClick on a faculty to simulate their unavailability\u003c/p\u003e
+                            
+                            \u003cdiv style=\"background: white; padding: 20px; border-radius: 12px; border: 1px solid #ddd;\"\u003e
+                                \u003ctable style=\"width: 100%; border-collapse: collapse;\"\u003e
+                                    \u003cthead\u003e
+                                        \u003ctr style=\"background: #667eea; color: white;\"\u003e
+                                            \u003cth style=\"padding: 12px; text-align: left;\"\u003eName\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: left;\"\u003eEmail\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: left;\"\u003eDepartment\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: center;\"\u003eAction\u003c/th\u003e
+                                        \u003c/tr\u003e
+                                    \u003c/thead\u003e
+                                    \u003ctbody\u003e
+                                        ${data.data.map((faculty, i) => `
+                                            \u003ctr style=\"background: ${i % 2 === 0 ? '#f8f9fa' : 'white'}; cursor: pointer;\"\u003e
+                                                \u003ctd style=\"padding: 10px; border: 1px solid #ddd;\"\u003e${faculty.name}\u003c/td\u003e
+                                                \u003ctd style=\"padding: 10px; border: 1px solid #ddd;\"\u003e${faculty.email}\u003c/td\u003e
+                                                \u003ctd style=\"padding: 10px; border: 1px solid #ddd;\"\u003e${faculty.department}\u003c/td\u003e
+                                                \u003ctd style=\"padding: 10px; border: 1px solid #ddd; text-align: center;\"\u003e
+                                                    \u003cbutton onclick=\"runFacultyImpactAnalysis('${faculty._id}')\" 
+                                                        style=\"background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;\"\u003e
+                                                        🧪 Analyze
+                                                    \u003c/button\u003e
+                                                \u003c/td\u003e
+                                            \u003c/tr\u003e
+                                        `).join('')}
+                                    \u003c/tbody\u003e
+                                \u003c/table\u003e
+                            \u003c/div\u003e
+                        \u003c/div\u003e
+                    `;
+                    document.getElementById('results').innerHTML = html;
+                } else {
+                    showStatus('Error loading faculty list', 'error');
+                }
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Run Faculty Impact Analysis with selected ID
+        async function runFacultyImpactAnalysis(facultyId) {
+            showStatus('Analyzing Faculty Impact... ⏳', 'info');
+            document.getElementById('results').innerHTML = '\u003cdiv class=\"loading\"\u003eAnalyzing faculty impact...\u003c/div\u003e';
+
+            try {
+                const response = await fetch(`${API_URL}/simulation/faculty-impact`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ facultyId })
+                });
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    const data = result.data;
+                    showStatus(`Faculty Impact Analysis Complete! Simulation ID: ${data.id}`, 'success');
+
+                    let html = `
+                        \u003cdiv style=\"max-width: 900px; margin: 0 auto;\"\u003e
+                            \u003ch2 style=\"color: #667eea; text-align: center; margin-bottom: 30px;\"\u003e🧪 Faculty Impact Analysis\u003c/h2\u003e
+                            \u003cp style=\"text-align: center; color: #666; margin-bottom: 30px; font-size: 0.9em;\"\u003eSimulation ID: \u003cstrong\u003e${data.id}\u003c/strong\u003e\u003c/p\u003e
+                            
+                            \u003cdiv style=\"display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;\"\u003e
+                                \u003cdiv style=\"background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); color: white; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 10px 30px rgba(255,107,107,0.3);\"\u003e
+                                    \u003ch3 style=\"font-size: 3em; margin: 0;\"\u003e${data.impactScore}\u003c/h3\u003e
+                                    \u003cp style=\"margin: 10px 0 0; opacity: 0.9;\"\u003eImpact Score (out of 100)\u003c/p\u003e
+                                \u003c/div\u003e
+                                \u003cdiv style=\"background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%); color: white; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 10px 30px rgba(255,165,0,0.3);\"\u003e
+                                    \u003ch3 style=\"font-size: 3em; margin: 0;\"\u003e${data.classesAffected}\u003c/h3\u003e
+                                    \u003cp style=\"margin: 10px 0 0; opacity: 0.9;\"\u003eClasses Affected\u003c/p\u003e
+                                \u003c/div\u003e
+                                \u003cdiv style=\"background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 10px 30px rgba(240,147,251,0.3);\"\u003e
+                                    \u003ch3 style=\"font-size: 3em; margin: 0;\"\u003e${data.studentsImpacted}\u003c/h3\u003e
+                                    \u003cp style=\"margin: 10px 0 0; opacity: 0.9;\"\u003eStudents Impacted\u003c/p\u003e
+                                \u003c/div\u003e
+                            \u003c/div\u003e
+
+                            \u003cdiv style=\"background: #f8f9fa; padding: 25px; border-radius: 12px; margin-bottom: 20px; border-left: 5px solid #667eea;\"\u003e
+                                \u003ch3 style=\"color: #667eea; margin-bottom: 15px;\"\u003e📢 Recommendations:\u003c/h3\u003e
+                                \u003cul style=\"margin: 0; padding-left: 20px; line-height: 1.8;\"\u003e
+                                    ${data.recommendations.map(r => `\u003cli\u003e${r}\u003c/li\u003e`).join('')}
+                                \u003c/ul\u003e
+                            \u003c/div\u003e
+
+                            \u003cdiv style=\"background: white; padding: 20px; border-radius: 12px; border: 1px solid #ddd;\"\u003e
+                                \u003ch3 style=\"color: #667eea; margin-bottom: 15px;\"\u003e📚 Affected Classes:\u003c/h3\u003e
+                                \u003ctable style=\"width: 100%; border-collapse: collapse;\"\u003e
+                                    \u003cthead\u003e
+                                        \u003ctr style=\"background: #667eea; color: white;\"\u003e
+                                            \u003cth style=\"padding: 12px; text-align: left;\"\u003eCourse\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: left;\"\u003eSection\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: left;\"\u003eDay\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: left;\"\u003eSlot\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: left;\"\u003eRoom\u003c/th\u003e
+                                        \u003c/tr\u003e
+                                    \u003c/thead\u003e
+                                    \u003ctbody\u003e
+                                        ${data.affectedClasses.map((c, i) => `
+                                            \u003ctr style=\"background: ${i % 2 === 0 ? '#f8f9fa' : 'white'};\"\u003e
+                                                \u003ctd style=\"padding: 10px; border: 1px solid #ddd;\"\u003e${c.course || 'N/A'}\u003c/td\u003e
+                                                \u003ctd style=\"padding: 10px; border: 1px solid #ddd;\"\u003e${c.section || 'N/A'}\u003c/td\u003e
+                                                \u003ctd style=\"padding: 10px; border: 1px solid #ddd;\"\u003e${c.day || 'N/A'}\u003c/td\u003e
+                                                \u003ctd style=\"padding: 10px; border: 1px solid #ddd;\"\u003e${c.slot || 'N/A'}\u003c/td\u003e
+                                                \u003ctd style=\"padding: 10px; border: 1px solid #ddd;\"\u003e${c.room || 'N/A'}\u003c/td\u003e
+                                            \u003c/tr\u003e
+                                        `).join('')}
+                                    \u003c/tbody\u003e
+                                \u003c/table\u003e
+                            \u003c/div\u003e
+                        \u003c/div\u003e
+                    `;
+                    document.getElementById('results').innerHTML = html;
+                } else {
+                    showStatus(`Error: ${result.message || 'Analysis failed'}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Feature 2: Room Shortage Analysis
+        async function roomShortageAnalysis() {
+            // First, fetch and show room list
+            showStatus('Loading Room List... ⏳', 'info');
+            document.getElementById('results').innerHTML = '\u003cdiv class=\"loading\"\u003eLoading room list...\u003c/div\u003e';
+
+            try {
+                const response = await fetch(`${API_URL}/room`);
+                const data = await response.json();
+
+                if (response.ok && data.data) {
+                    showStatus('Select a room to analyze', 'info');
+
+                    let html = `
+                        \u003cdiv style=\"max-width: 1000px; margin: 0 auto;\"\u003e
+                            \u003ch2 style=\"color: #667eea; text-align: center; margin-bottom: 30px;\"\u003e🏫 Room Shortage Analysis - Select Room\u003c/h2\u003e
+                            \u003cp style=\"text-align: center; color: #666; margin-bottom: 30px;\"\u003eClick on a room to simulate its unavailability\u003c/p\u003e
+                            
+                            \u003cdiv style=\"background: white; padding: 20px; border-radius: 12px; border: 1px solid #ddd;\"\u003e
+                                \u003ctable style=\"width: 100%; border-collapse: collapse;\"\u003e
+                                    \u003cthead\u003e
+                                        \u003ctr style=\"background: #667eea; color: white;\"\u003e
+                                            \u003cth style=\"padding: 12px; text-align: left;\"\u003eRoom Name\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: left;\"\u003eType\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: center;\"\u003eCapacity\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: center;\"\u003eAction\u003c/th\u003e
+                                        \u003c/tr\u003e
+                                    \u003c/thead\u003e
+                                    \u003ctbody\u003e
+                                        ${data.data.map((room, i) => `
+                                            \u003ctr style=\"background: ${i % 2 === 0 ? '#f8f9fa' : 'white'}; cursor: pointer;\"\u003e
+                                                \u003ctd style=\"padding: 10px; border: 1px solid #ddd;\"\u003e${room.name}\u003c/td\u003e
+                                                \u003ctd style=\"padding: 10px; border: 1px solid #ddd;\"\u003e${room.roomType}\u003c/td\u003e
+                                                \u003ctd style=\"padding: 10px; border: 1px solid #ddd; text-align: center;\"\u003e${room.capacity}\u003c/td\u003e
+                                                \u003ctd style=\"padding: 10px; border: 1px solid #ddd; text-align: center;\"\u003e
+                                                    \u003cbutton onclick=\"runRoomShortageAnalysis('${room._id}')\" 
+                                                        style=\"background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;\"\u003e
+                                                        🏫 Analyze
+                                                    \u003c/button\u003e
+                                                \u003c/td\u003e
+                                            \u003c/tr\u003e
+                                        `).join('')}
+                                    \u003c/tbody\u003e
+                                \u003c/table\u003e
+                            \u003c/div\u003e
+                        \u003c/div\u003e
+                    `;
+                    document.getElementById('results').innerHTML = html;
+                } else {
+                    showStatus('Error loading room list', 'error');
+                }
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Run Room Shortage Analysis with selected ID
+        async function runRoomShortageAnalysis(roomId) {
+            showStatus('Analyzing Room Impact... ⏳', 'info');
+            document.getElementById('results').innerHTML = '\u003cdiv class=\"loading\"\u003eAnalyzing room shortage...\u003c/div\u003e';
+
+            try {
+                const response = await fetch(`${API_URL}/simulation/room-shortage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ roomId })
+                });
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    const data = result.data;
+                    showStatus(`Room Shortage Analysis Complete! Simulation ID: ${data.id}`, 'success');
+
+                    let html = `
+                        \u003cdiv style=\"max-width: 900px; margin: 0 auto;\"\u003e
+                            \u003ch2 style=\"color: #667eea; text-align: center; margin-bottom: 30px;\"\u003e🏫 Room Shortage Analysis\u003c/h2\u003e
+                            \u003cp style=\"text-align: center; color: #666; margin-bottom: 30px; font-size: 0.9em;\"\u003eSimulation ID: \u003cstrong\u003e${data.id}\u003c/strong\u003e\u003c/p\u003e
+                            
+                            \u003cdiv style=\"display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;\"\u003e
+                                \u003cdiv style=\"background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); color: white; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 10px 30px rgba(255,107,107,0.3);\"\u003e
+                                    \u003ch3 style=\"font-size: 3em; margin: 0;\"\u003e${data.impactScore}\u003c/h3\u003e
+                                    \u003cp style=\"margin: 10px 0 0; opacity: 0.9;\"\u003eImpact Score (out of 100)\u003c/p\u003e
+                                \u003c/div\u003e
+                                \u003cdiv style=\"background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 10px 30px rgba(79,172,254,0.3);\"\u003e
+                                    \u003ch3 style=\"font-size: 3em; margin: 0;\"\u003e${data.classesAffected}\u003c/h3\u003e
+                                    \u003cp style=\"margin: 10px 0 0; opacity: 0.9;\"\u003eClasses Affected\u003c/p\u003e
+                                \u003c/div\u003e
+                                \u003cdiv style=\"background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 10px 30px rgba(17,153,142,0.3);\"\u003e
+                                    \u003ch3 style=\"font-size: 3em; margin: 0;\"\u003e${data.alternativesFound}\u003c/h3\u003e
+                                    \u003cp style=\"margin: 10px 0 0; opacity: 0.9;\"\u003eAlternatives Found\u003c/p\u003e
+                                \u003c/div\u003e
+                            \u003c/div\u003e
+
+                            \u003cdiv style=\"background: #f8f9fa; padding: 25px; border-radius: 12px; margin-bottom: 20px; border-left: 5px solid #667eea;\"\u003e
+                                \u003ch3 style=\"color: #667eea; margin-bottom: 15px;\"\u003e📢 Recommendations:\u003c/h3\u003e
+                                \u003cul style=\"margin: 0; padding-left: 20px; line-height: 1.8;\"\u003e
+                                    ${data.recommendations.map(r => `\u003cli\u003e${r}\u003c/li\u003e`).join('')}
+                                \u003c/ul\u003e
+                            \u003c/div\u003e
+
+                            ${data.alternativeRooms.length > 0 ? `
+                                \u003cdiv style=\"background: white; padding: 20px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 20px;\"\u003e
+                                    \u003ch3 style=\"color: #667eea; margin-bottom: 15px;\"\u003e🏫 Alternative Rooms:\u003c/h3\u003e
+                                    \u003ctable style=\"width: 100%; border-collapse: collapse;\"\u003e
+                                        \u003cthead\u003e
+                                            \u003ctr style=\"background: #667eea; color: white;\"\u003e
+                                                \u003cth style=\"padding: 12px; text-align: left;\"\u003eRoom\u003c/th\u003e
+                                                \u003cth style=\"padding: 12px; text-align: left;\"\u003eCapacity\u003c/th\u003e
+                                                \u003cth style=\"padding: 12px; text-align: left;\"\u003eType\u003c/th\u003e
+                                            \u003c/tr\u003e
+                                        \u003c/thead\u003e
+                                        \u003ctbody\u003e
+                                            ${data.alternativeRooms.map((r, i) => `
+                                                \u003ctr style=\"background: ${i % 2 === 0 ? '#f8f9fa' : 'white'};\"\u003e
+                                                    \u003ctd style=\"padding: 10px; border: 1px solid #ddd;\"\u003e${r.name}\u003c/td\u003e
+                                                    \u003ctd style=\"padding: 10px; border: 1px solid #ddd;\"\u003e${r.capacity}\u003c/td\u003e
+                                                    \u003ctd style=\"padding: 10px; border: 1px solid #ddd;\"\u003e${r.type}\u003c/td\u003e
+                                                \u003c/tr\u003e
+                                            `).join('')}
+                                        \u003c/tbody\u003e
+                                    \u003c/table\u003e
+                                \u003c/div\u003e
+                            ` : ''}
+                        \u003c/div\u003e
+                    `;
+                    document.getElementById('results').innerHTML = html;
+                } else {
+                    showStatus(`Error: ${result.message || 'Analysis failed'}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Feature 3: View Simulation History
+        async function viewSimulationHistory() {
+            showStatus('Loading Simulation History... ⏳', 'info');
+            document.getElementById('results').innerHTML = '\u003cdiv class=\"loading\"\u003eLoading history...\u003c/div\u003e';
+
+            try {
+                const response = await fetch(`${API_URL}/simulation/history`);
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    const simulations = result.data;
+                    showStatus(`Loaded ${simulations.length} simulations`, 'success');
+
+                    if (simulations.length === 0) {
+                        document.getElementById('results').innerHTML = `
+                            \u003cdiv style=\"text-align: center; padding: 60px; color: #666;\"\u003e
+                                \u003ch3\u003e📊 No Simulations Yet\u003c/h3\u003e
+                                \u003cp\u003eRun a Faculty Impact or Room Shortage analysis to see history.\u003c/p\u003e
+                            \u003c/div\u003e
+                        `;
+                        return;
+                    }
+
+                    let html = `
+                        \u003cdiv style=\"max-width: 1000px; margin: 0 auto;\"\u003e
+                            \u003ch2 style=\"color: #667eea; text-align: center; margin-bottom: 30px;\"\u003e📊 Simulation History\u003c/h2\u003e
+                            \u003cp style=\"text-align: center; color: #666; margin-bottom: 30px;\"\u003eTotal Simulations: \u003cstrong\u003e${result.total}\u003c/strong\u003e (Showing last ${simulations.length})\u003c/p\u003e
+                            
+                            \u003cdiv style=\"background: white; padding: 20px; border-radius: 12px; border: 1px solid #ddd;\"\u003e
+                                \u003ctable style=\"width: 100%; border-collapse: collapse;\"\u003e
+                                    \u003cthead\u003e
+                                        \u003ctr style=\"background: #667eea; color: white;\"\u003e
+                                            \u003cth style=\"padding: 12px; text-align: left;\"\u003eSimulation ID\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: left;\"\u003eType\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: center;\"\u003eScore\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: center;\"\u003eClasses\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: center;\"\u003eStudents\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: left;\"\u003eTime\u003c/th\u003e
+                                        \u003c/tr\u003e
+                                    \u003c/thead\u003e
+                                    \u003ctbody\u003e
+                                        ${simulations.map((s, i) => {
+                        const severityColor = s.impactScore > 50 ? '#ff6b6b' : s.impactScore > 25 ? '#ffa500' : '#28a745';
+                        const timeAgo = getTimeAgo(new Date(s.timestamp));
+                        return `
+                                                \u003ctr style=\"background: ${i % 2 === 0 ? '#f8f9fa' : 'white'};\"\u003e
+                                                    \u003ctd style=\"padding: 10px; border: 1px solid #ddd; font-family: monospace; font-size: 0.85em;\"\u003e${s.id}\u003c/td\u003e
+                                                    \u003ctd style=\"padding: 10px; border: 1px solid #ddd;\"\u003e
+                                                        \u003cspan style=\"background: #667eea; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.85em;\"\u003e${s.type}\u003c/span\u003e
+                                                    \u003c/td\u003e
+                                                    \u003ctd style=\"padding: 10px; border: 1px solid #ddd; text-align: center;\"\u003e
+                                                        \u003cspan style=\"background: ${severityColor}; color: white; padding: 4px 12px; border-radius: 4px; font-weight: bold;\"\u003e${s.impactScore}\u003c/span\u003e
+                                                    \u003c/td\u003e
+                                                    \u003ctd style=\"padding: 10px; border: 1px solid #ddd; text-align: center;\"\u003e${s.classesAffected}\u003c/td\u003e
+                                                    \u003ctd style=\"padding: 10px; border: 1px solid #ddd; text-align: center;\"\u003e${s.studentsImpacted}\u003c/td\u003e
+                                                    \u003ctd style=\"padding: 10px; border: 1px solid #ddd; font-size: 0.9em; color: #666;\"\u003e${timeAgo}\u003c/td\u003e
+                                                \u003c/tr\u003e
+                                            `;
+                    }).join('')}
+                                    \u003c/tbody\u003e
+                                \u003c/table\u003e
+                            \u003c/div\u003e
+                            
+                            \u003cdiv style=\"margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 8px; text-align: center; color: #1976d2;\"\u003e
+                                💡 \u003cstrong\u003eTip:\u003c/strong\u003e Copy Simulation IDs to compare scenarios!
+                            \u003c/div\u003e
+                        \u003c/div\u003e
+                    `;
+                    document.getElementById('results').innerHTML = html;
+                } else {
+                    showStatus(`Error: ${result.message || 'Failed to load history'}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Feature 4: Compare Scenarios
+        async function compareScenarios() {
+            // First, fetch and show simulation history
+            showStatus('Loading Simulation History... ⏳', 'info');
+            document.getElementById('results').innerHTML = '\u003cdiv class=\"loading\"\u003eLoading simulations...\u003c/div\u003e';
+
+            try {
+                const response = await fetch(`${API_URL}/simulation/history`);
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    const simulations = result.data;
+
+                    if (simulations.length < 2) {
+                        showStatus('Need at least 2 simulations to compare', 'error');
+                        document.getElementById('results').innerHTML = `
+                            \u003cdiv style=\"text-align: center; padding: 60px; color: #666;\"\u003e
+                                \u003ch3\u003e🔄 Not Enough Simulations\u003c/h3\u003e
+                                \u003cp\u003eYou need at least 2 simulations to compare.\u003c/p\u003e
+                                \u003cp\u003eRun Faculty Impact or Room Shortage analysis first.\u003c/p\u003e
+                            \u003c/div\u003e
+                        `;
+                        return;
+                    }
+
+                    showStatus('Select two simulations to compare', 'info');
+
+                    let html = `
+                        \u003cdiv style=\"max-width: 1000px; margin: 0 auto;\"\u003e
+                            \u003ch2 style=\"color: #667eea; text-align: center; margin-bottom: 30px;\"\u003e🔄 Compare Scenarios - Select Simulations\u003c/h2\u003e
+                            \u003cp style=\"text-align: center; color: #666; margin-bottom: 30px;\"\u003eSelect two simulations to compare\u003c/p\u003e
+                            
+                            \u003cdiv style=\"background: white; padding: 20px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 20px;\"\u003e
+                                \u003cdiv style=\"margin-bottom: 20px; text-align: center;\"\u003e
+                                    \u003cbutton onclick=\"runCompareScenarios()\" 
+                                        style=\"background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; border: none; padding: 12px 30px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px;\"\u003e
+                                        🔄 Compare Selected Simulations
+                                    \u003c/button\u003e
+                                \u003c/div\u003e
+                                
+                                \u003ctable style=\"width: 100%; border-collapse: collapse;\"\u003e
+                                    \u003cthead\u003e
+                                        \u003ctr style=\"background: #667eea; color: white;\"\u003e
+                                            \u003cth style=\"padding: 12px; text-align: center; width: 80px;\"\u003eSelect 1st\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: center; width: 80px;\"\u003eSelect 2nd\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: left;\"\u003eSimulation ID\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: left;\"\u003eType\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: center;\"\u003eScore\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: center;\"\u003eClasses\u003c/th\u003e
+                                        \u003c/tr\u003e
+                                    \u003c/thead\u003e
+                                    \u003ctbody\u003e
+                                        ${simulations.map((s, i) => {
+                        const severityColor = s.impactScore > 50 ? '#ff6b6b' : s.impactScore > 25 ? '#ffa500' : '#28a745';
+                        return `
+                                                \u003ctr style=\"background: ${i % 2 === 0 ? '#f8f9fa' : 'white'};\"\u003e
+                                                    \u003ctd style=\"padding: 10px; border: 1px solid #ddd; text-align: center;\"\u003e
+                                                        \u003cinput type=\"radio\" name=\"sim1\" value=\"${s.id}\" 
+                                                            style=\"width: 18px; height: 18px; cursor: pointer;\"\u003e
+                                                    \u003c/td\u003e
+                                                    \u003ctd style=\"padding: 10px; border: 1px solid #ddd; text-align: center;\"\u003e
+                                                        \u003cinput type=\"radio\" name=\"sim2\" value=\"${s.id}\" 
+                                                            style=\"width: 18px; height: 18px; cursor: pointer;\"\u003e
+                                                    \u003c/td\u003e
+                                                    \u003ctd style=\"padding: 10px; border: 1px solid #ddd; font-family: monospace; font-size: 0.85em;\"\u003e${s.id}\u003c/td\u003e
+                                                    \u003ctd style=\"padding: 10px; border: 1px solid #ddd;\"\u003e
+                                                        \u003cspan style=\"background: #667eea; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.85em;\"\u003e${s.type}\u003c/span\u003e
+                                                    \u003c/td\u003e
+                                                    \u003ctd style=\"padding: 10px; border: 1px solid #ddd; text-align: center;\"\u003e
+                                                        \u003cspan style=\"background: ${severityColor}; color: white; padding: 4px 12px; border-radius: 4px; font-weight: bold;\"\u003e${s.impactScore}\u003c/span\u003e
+                                                    \u003c/td\u003e
+                                                    \u003ctd style=\"padding: 10px; border: 1px solid #ddd; text-align: center;\"\u003e${s.classesAffected}\u003c/td\u003e
+                                                \u003c/tr\u003e
+                                            `;
+                    }).join('')}
+                                    \u003c/tbody\u003e
+                                \u003c/table\u003e
+                            \u003c/div\u003e
+                        \u003c/div\u003e
+                    `;
+                    document.getElementById('results').innerHTML = html;
+                } else {
+                    showStatus('Error loading simulations', 'error');
+                }
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Run comparison with selected simulations
+        async function runCompareScenarios() {
+            const sim1 = document.querySelector('input[name="sim1"]:checked');
+            const sim2 = document.querySelector('input[name="sim2"]:checked');
+
+            if (!sim1 || !sim2) {
+                alert('Please select two simulations to compare');
+                return;
+            }
+
+            if (sim1.value === sim2.value) {
+                alert('Please select two different simulations');
+                return;
+            }
+
+            showStatus('Comparing Scenarios... ⏳', 'info');
+            document.getElementById('results').innerHTML = '\u003cdiv class=\"loading\"\u003eComparing scenarios...\u003c/div\u003e';
+
+            try {
+                const response = await fetch(`${API_URL}/simulation/compare`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ simulationId1: sim1.value, simulationId2: sim2.value })
+                });
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    const data = result.data;
+                    showStatus('Comparison Complete!', 'success');
+
+                    let html = `
+                        \u003cdiv style=\"max-width: 900px; margin: 0 auto;\"\u003e
+                            \u003ch2 style=\"color: #667eea; text-align: center; margin-bottom: 30px;\"\u003e🔄 Scenario Comparison\u003c/h2\u003e
+                            
+                            \u003cdiv style=\"display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;\"\u003e
+                                \u003cdiv style=\"background: white; padding: 25px; border-radius: 12px; border: 2px solid ${data.winner === 1 ? '#ff6b6b' : '#ddd'};\"\u003e
+                                    \u003ch3 style=\"color: #667eea; margin-bottom: 20px; text-align: center;\"\u003eSimulation 1 ${data.winner === 1 ? '🏆' : ''}\u003c/h3\u003e
+                                    \u003cdiv style=\"margin-bottom: 15px;\"\u003e
+                                        \u003cstrong\u003eID:\u003c/strong\u003e \u003cspan style=\"font-family: monospace; font-size: 0.85em;\"\u003e${data.simulation1.id}\u003c/span\u003e
+                                    \u003c/div\u003e
+                                    \u003cdiv style=\"margin-bottom: 15px;\"\u003e
+                                        \u003cstrong\u003eType:\u003c/strong\u003e \u003cspan style=\"background: #667eea; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.85em;\"\u003e${data.simulation1.type}\u003c/span\u003e
+                                    \u003c/div\u003e
+                                    \u003cdiv style=\"margin-bottom: 15px;\"\u003e
+                                        \u003cstrong\u003eImpact Score:\u003c/strong\u003e \u003cspan style=\"background: #ff6b6b; color: white; padding: 4px 12px; border-radius: 4px; font-weight: bold; font-size: 1.2em;\"\u003e${data.simulation1.impactScore}\u003c/span\u003e
+                                    \u003c/div\u003e
+                                    \u003cdiv style=\"margin-bottom: 15px;\"\u003e
+                                        \u003cstrong\u003eClasses:\u003c/strong\u003e ${data.simulation1.classesAffected}
+                                    \u003c/div\u003e
+                                    \u003cdiv\u003e
+                                        \u003cstrong\u003eStudents:\u003c/strong\u003e ${data.simulation1.studentsImpacted}
+                                    \u003c/div\u003e
+                                \u003c/div\u003e
+
+                                \u003cdiv style=\"background: white; padding: 25px; border-radius: 12px; border: 2px solid ${data.winner === 2 ? '#ff6b6b' : '#ddd'};\"\u003e
+                                    \u003ch3 style=\"color: #667eea; margin-bottom: 20px; text-align: center;\"\u003eSimulation 2 ${data.winner === 2 ? '🏆' : ''}\u003c/h3\u003e
+                                    \u003cdiv style=\"margin-bottom: 15px;\"\u003e
+                                        \u003cstrong\u003eID:\u003c/strong\u003e \u003cspan style=\"font-family: monospace; font-size: 0.85em;\"\u003e${data.simulation2.id}\u003c/span\u003e
+                                    \u003c/div\u003e
+                                    \u003cdiv style=\"margin-bottom: 15px;\"\u003e
+                                        \u003cstrong\u003eType:\u003c/strong\u003e \u003cspan style=\"background: #667eea; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.85em;\"\u003e${data.simulation2.type}\u003c/span\u003e
+                                    \u003c/div\u003e
+                                    \u003cdiv style=\"margin-bottom: 15px;\"\u003e
+                                        \u003cstrong\u003eImpact Score:\u003c/strong\u003e \u003cspan style=\"background: #ffa500; color: white; padding: 4px 12px; border-radius: 4px; font-weight: bold; font-size: 1.2em;\"\u003e${data.simulation2.impactScore}\u003c/span\u003e
+                                    \u003c/div\u003e
+                                    \u003cdiv style=\"margin-bottom: 15px;\"\u003e
+                                        \u003cstrong\u003eClasses:\u003c/strong\u003e ${data.simulation2.classesAffected}
+                                    \u003c/div\u003e
+                                    \u003cdiv\u003e
+                                        \u003cstrong\u003eStudents:\u003c/strong\u003e ${data.simulation2.studentsImpacted}
+                                    \u003c/div\u003e
+                                \u003c/div\u003e
+                            \u003c/div\u003e
+
+                            \u003cdiv style=\"background: #fff3cd; padding: 25px; border-radius: 12px; border-left: 5px solid #ffc107; margin-bottom: 20px;\"\u003e
+                                \u003ch3 style=\"color: #856404; margin-bottom: 15px;\"\u003e🏆 Winner: Simulation ${data.winner}\u003c/h3\u003e
+                                \u003cp style=\"margin: 0; color: #856404; font-size: 1.1em;\"\u003e
+                                    \u003cstrong\u003eScore Difference:\u003c/strong\u003e ${data.scoreDifference} points
+                                \u003c/p\u003e
+                            \u003c/div\u003e
+
+                            \u003cdiv style=\"background: #e3f2fd; padding: 20px; border-radius: 12px; text-align: center;\"\u003e
+                                \u003cp style=\"margin: 0; color: #1976d2; font-size: 1.05em;\"\u003e
+                                    💡 ${data.recommendation}
+                                \u003c/p\u003e
+                            \u003c/div\u003e
+                        \u003c/div\u003e
+                    `;
+                    document.getElementById('results').innerHTML = html;
+                } else {
+                    showStatus(`Error: ${result.message || 'Comparison failed'}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Feature 5: Bulk Faculty Analysis
+        async function bulkFacultyAnalysis() {
+            // First, fetch and show faculty list with checkboxes
+            showStatus('Loading Faculty List... ⏳', 'info');
+            document.getElementById('results').innerHTML = '\u003cdiv class=\"loading\"\u003eLoading faculty list...\u003c/div\u003e';
+
+            try {
+                const response = await fetch(`${API_URL}/faculty`);
+                const data = await response.json();
+
+                if (response.ok && data.data) {
+                    showStatus('Select multiple faculty to analyze', 'info');
+
+                    let html = `
+                        \u003cdiv style=\"max-width: 1000px; margin: 0 auto;\"\u003e
+                            \u003ch2 style=\"color: #667eea; text-align: center; margin-bottom: 30px;\"\u003e📈 Bulk Faculty Analysis - Select Faculty\u003c/h2\u003e
+                            \u003cp style=\"text-align: center; color: #666; margin-bottom: 30px;\"\u003eSelect multiple faculty members to compare their impact\u003c/p\u003e
+                            
+                            \u003cdiv style=\"background: white; padding: 20px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 20px;\"\u003e
+                                \u003cdiv style=\"margin-bottom: 20px; text-align: center;\"\u003e
+                                    \u003cbutton onclick=\"runBulkFacultyAnalysis()\" 
+                                        style=\"background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); color: #333; border: none; padding: 12px 30px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px;\"\u003e
+                                        📊 Analyze Selected Faculty
+                                    \u003c/button\u003e
+                                    \u003cbutton onclick=\"toggleAllFaculty(true)\" 
+                                        style=\"background: #28a745; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; margin-left: 10px;\"\u003e
+                                        ✅ Select All
+                                    \u003c/button\u003e
+                                    \u003cbutton onclick=\"toggleAllFaculty(false)\" 
+                                        style=\"background: #dc3545; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; margin-left: 10px;\"\u003e
+                                        ❌ Clear All
+                                    \u003c/button\u003e
+                                \u003c/div\u003e
+                                
+                                \u003ctable style=\"width: 100%; border-collapse: collapse;\"\u003e
+                                    \u003cthead\u003e
+                                        \u003ctr style=\"background: #667eea; color: white;\"\u003e
+                                            \u003cth style=\"padding: 12px; text-align: center; width: 50px;\"\u003eSelect\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: left;\"\u003eName\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: left;\"\u003eEmail\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: left;\"\u003eDepartment\u003c/th\u003e
+                                        \u003c/tr\u003e
+                                    \u003c/thead\u003e
+                                    \u003ctbody\u003e
+                                        ${data.data.map((faculty, i) => `
+                                            \u003ctr style=\"background: ${i % 2 === 0 ? '#f8f9fa' : 'white'};\"\u003e
+                                                \u003ctd style=\"padding: 10px; border: 1px solid #ddd; text-align: center;\"\u003e
+                                                    \u003cinput type=\"checkbox\" class=\"faculty-checkbox\" value=\"${faculty._id}\" 
+                                                        style=\"width: 18px; height: 18px; cursor: pointer;\"\u003e
+                                                \u003c/td\u003e
+                                                \u003ctd style=\"padding: 10px; border: 1px solid #ddd;\"\u003e${faculty.name}\u003c/td\u003e
+                                                \u003ctd style=\"padding: 10px; border: 1px solid #ddd;\"\u003e${faculty.email}\u003c/td\u003e
+                                                \u003ctd style=\"padding: 10px; border: 1px solid #ddd;\"\u003e${faculty.department}\u003c/td\u003e
+                                            \u003c/tr\u003e
+                                        `).join('')}
+                                    \u003c/tbody\u003e
+                                \u003c/table\u003e
+                            \u003c/div\u003e
+                        \u003c/div\u003e
+                    `;
+                    document.getElementById('results').innerHTML = html;
+                } else {
+                    showStatus('Error loading faculty list', 'error');
+                }
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Toggle all faculty checkboxes
+        function toggleAllFaculty(select) {
+            const checkboxes = document.querySelectorAll('.faculty-checkbox');
+            checkboxes.forEach(cb => cb.checked = select);
+        }
+
+        // Run Bulk Faculty Analysis with selected IDs
+        async function runBulkFacultyAnalysis() {
+            const checkboxes = document.querySelectorAll('.faculty-checkbox:checked');
+            const facultyIds = Array.from(checkboxes).map(cb => cb.value);
+            if (facultyIds.length === 0) {
+                alert('Please enter at least one Faculty ID');
+                return;
+            }
+
+            showStatus('Analyzing Multiple Faculty... ⏳', 'info');
+            document.getElementById('results').innerHTML = '\u003cdiv class=\"loading\"\u003eAnalyzing faculty members...\u003c/div\u003e';
+
+            try {
+                const response = await fetch(`${API_URL}/simulation/bulk-faculty`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ facultyIds })
+                });
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    const data = result.data;
+                    const mostCritical = result.mostCritical;
+                    showStatus(`Analyzed ${data.length} faculty members`, 'success');
+
+                    let html = `
+                        \u003cdiv style=\"max-width: 1000px; margin: 0 auto;\"\u003e
+                            \u003ch2 style=\"color: #667eea; text-align: center; margin-bottom: 30px;\"\u003e📈 Bulk Faculty Analysis\u003c/h2\u003e
+                            \u003cp style=\"text-align: center; color: #666; margin-bottom: 30px;\"\u003eTotal Analyzed: \u003cstrong\u003e${data.length}\u003c/strong\u003e faculty members\u003c/p\u003e
+                            
+                            \u003cdiv style=\"background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); color: white; padding: 30px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(255,107,107,0.3);\"\u003e
+                                \u003ch3 style=\"margin: 0 0 15px; font-size: 1.5em;\"\u003e🏆 MOST CRITICAL FACULTY\u003c/h3\u003e
+                                \u003cdiv style=\"display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 20px;\"\u003e
+                                    \u003cdiv\u003e
+                                        \u003cp style=\"margin: 0; opacity: 0.9; font-size: 0.9em;\"\u003eFaculty ID\u003c/p\u003e
+                                        \u003cp style=\"margin: 5px 0 0; font-family: monospace; font-size: 0.85em;\"\u003e${mostCritical.facultyId}\u003c/p\u003e
+                                    \u003c/div\u003e
+                                    \u003cdiv\u003e
+                                        \u003cp style=\"margin: 0; opacity: 0.9; font-size: 0.9em;\"\u003eImpact Score\u003c/p\u003e
+                                        \u003cp style=\"margin: 5px 0 0; font-size: 2em; font-weight: bold;\"\u003e${mostCritical.impactScore}\u003c/p\u003e
+                                    \u003c/div\u003e
+                                    \u003cdiv\u003e
+                                        \u003cp style=\"margin: 0; opacity: 0.9; font-size: 0.9em;\"\u003eClasses\u003c/p\u003e
+                                        \u003cp style=\"margin: 5px 0 0; font-size: 2em; font-weight: bold;\"\u003e${mostCritical.classesAffected}\u003c/p\u003e
+                                    \u003c/div\u003e
+                                    \u003cdiv\u003e
+                                        \u003cp style=\"margin: 0; opacity: 0.9; font-size: 0.9em;\"\u003eStudents\u003c/p\u003e
+                                        \u003cp style=\"margin: 5px 0 0; font-size: 2em; font-weight: bold;\"\u003e${mostCritical.studentsImpacted}\u003c/p\u003e
+                                    \u003c/div\u003e
+                                \u003c/div\u003e
+                            \u003c/div\u003e
+
+                            \u003cdiv style=\"background: white; padding: 20px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 20px;\"\u003e
+                                \u003ch3 style=\"color: #667eea; margin-bottom: 15px;\"\u003e📊 Ranked Results (Highest to Lowest Impact):\u003c/h3\u003e
+                                \u003ctable style=\"width: 100%; border-collapse: collapse;\"\u003e
+                                    \u003cthead\u003e
+                                        \u003ctr style=\"background: #667eea; color: white;\"\u003e
+                                            \u003cth style=\"padding: 12px; text-align: center;\"\u003eRank\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: left;\"\u003eFaculty ID\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: center;\"\u003eImpact\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: center;\"\u003eClasses\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: center;\"\u003eStudents\u003c/th\u003e
+                                            \u003cth style=\"padding: 12px; text-align: left;\"\u003eSeverity\u003c/th\u003e
+                                        \u003c/tr\u003e
+                                    \u003c/thead\u003e
+                                    \u003ctbody\u003e
+                                        ${data.map((f, i) => {
+                        const severityColor = f.impactScore > 50 ? '#ff6b6b' : f.impactScore > 25 ? '#ffa500' : '#28a745';
+                        return `
+                                                \u003ctr style=\"background: ${i % 2 === 0 ? '#f8f9fa' : 'white'};\"\u003e
+                                                    \u003ctd style=\"padding: 10px; border: 1px solid #ddd; text-align: center; font-weight: bold; font-size: 1.1em;\"\u003e${f.rank}\u003c/td\u003e
+                                                    \u003ctd style=\"padding: 10px; border: 1px solid #ddd; font-family: monospace; font-size: 0.85em;\"\u003e${f.facultyId}\u003c/td\u003e
+                                                    \u003ctd style=\"padding: 10px; border: 1px solid #ddd; text-align: center;\"\u003e
+                                                        \u003cspan style=\"background: ${severityColor}; color: white; padding: 4px 12px; border-radius: 4px; font-weight: bold;\"\u003e${f.impactScore}\u003c/span\u003e
+                                                    \u003c/td\u003e
+                                                    \u003ctd style=\"padding: 10px; border: 1px solid #ddd; text-align: center;\"\u003e${f.classesAffected}\u003c/td\u003e
+                                                    \u003ctd style=\"padding: 10px; border: 1px solid #ddd; text-align: center;\"\u003e${f.studentsImpacted}\u003c/td\u003e
+                                                    \u003ctd style=\"padding: 10px; border: 1px solid #ddd;\"\u003e
+                                                        \u003cspan style=\"background: ${severityColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.85em;\"\u003e${f.severity}\u003c/span\u003e
+                                                    \u003c/td\u003e
+                                                \u003c/tr\u003e
+                                            `;
+                    }).join('')}
+                                    \u003c/tbody\u003e
+                                \u003c/table\u003e
+                            \u003c/div\u003e
+
+                            \u003cdiv style=\"background: #e3f2fd; padding: 20px; border-radius: 12px; text-align: center;\"\u003e
+                                \u003cp style=\"margin: 0; color: #1976d2; font-size: 1.05em;\"\u003e
+                                    💡 ${result.recommendation}
+                                \u003c/p\u003e
+                            \u003c/div\u003e
+                        \u003c/div\u003e
+                    `;
+                    document.getElementById('results').innerHTML = html;
+                } else {
+                    showStatus(`Error: ${result.message || 'Analysis failed'}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Helper function to calculate time ago
+        function getTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            if (seconds < 60) return 'Just now';
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return `${minutes} min${minutes > 1 ? 's' : ''} ago`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            const days = Math.floor(hours / 24);
+            return `${days} day${days > 1 ? 's' : ''} ago`;
         }
     </script>
 </body>
