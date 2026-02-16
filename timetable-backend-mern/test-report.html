@@ -1,0 +1,880 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Report - Timetable Impact Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 40px;
+            background: #f8f9fa;
+        }
+        
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        .card-value {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .card-label {
+            color: #6c757d;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .passed { color: #28a745; }
+        .failed { color: #dc3545; }
+        .duration { color: #17a2b8; }
+        .coverage { color: #ffc107; }
+        
+        .coverage-section {
+            padding: 40px;
+        }
+        
+        .coverage-section h2 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 1.8em;
+        }
+        
+        .coverage-bars {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .coverage-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .coverage-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .progress-bar {
+            height: 30px;
+            background: #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+            transition: width 1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .suites-section {
+            padding: 40px;
+            background: white;
+        }
+        
+        .suites-section h2 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 1.8em;
+        }
+        
+        .suite {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .suite-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .test-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            transition: background 0.2s;
+        }
+        
+        .test-item:hover {
+            background: #e9ecef;
+        }
+        
+        .test-name {
+            flex: 1;
+            color: #495057;
+        }
+        
+        .test-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .status-passed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .test-duration {
+            margin-left: 15px;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        
+        .footer {
+            background: #343a40;
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+            }
+            .card:hover {
+                transform: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🧪 Test Report</h1>
+            <p>Timetable Impact Analysis System</p>
+            <p style="font-size: 0.9em; margin-top: 10px;">
+                Generated: 16/2/2026, 2:41:58 pm
+            </p>
+        </div>
+        
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="card">
+                <div class="card-label">Total Tests</div>
+                <div class="card-value">67</div>
+            </div>
+            <div class="card">
+                <div class="card-label">Passed</div>
+                <div class="card-value passed">✓ 67</div>
+            </div>
+            <div class="card">
+                <div class="card-label">Failed</div>
+                <div class="card-value failed">✗ 0</div>
+            </div>
+            <div class="card">
+                <div class="card-label">Pass Rate</div>
+                <div class="card-value coverage">100.00%</div>
+            </div>
+            <div class="card">
+                <div class="card-label">Duration</div>
+                <div class="card-value duration">16.455s</div>
+            </div>
+        </div>
+        
+        <!-- Coverage Section -->
+        <div class="coverage-section">
+            <h2>📊 Code Coverage</h2>
+            <div class="coverage-bars">
+                <div class="coverage-item">
+                    <div class="coverage-label">
+                        <span>Lines</span>
+                        <span>94.23%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 94.23%">
+                            94.23%
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="coverage-item">
+                    <div class="coverage-label">
+                        <span>Functions</span>
+                        <span>96.15%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 96.15%">
+                            96.15%
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="coverage-item">
+                    <div class="coverage-label">
+                        <span>Branches</span>
+                        <span>89.47%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 89.47%">
+                            89.47%
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="coverage-item">
+                    <div class="coverage-label">
+                        <span>Statements</span>
+                        <span>94.23%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 94.23%">
+                            94.23%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Test Suites -->
+        <div class="suites-section">
+            <h2>🧩 Test Suites</h2>
+            
+                <div class="suite">
+                    <div class="suite-name">analysis.api.test.js</div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should return 200 for valid faculty ID</div>
+                            <div class="test-duration">108ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should return correct faculty details</div>
+                            <div class="test-duration">19ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should calculate impact score correctly</div>
+                            <div class="test-duration">16ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should return appropriate recommendations</div>
+                            <div class="test-duration">18ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should return 400 for missing facultyId</div>
+                            <div class="test-duration">8ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should return 400 for invalid ObjectId format</div>
+                            <div class="test-duration">7ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should return 404 for non-existent faculty</div>
+                            <div class="test-duration">7ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should return 200 for valid room ID</div>
+                            <div class="test-duration">23ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should return alternative rooms</div>
+                            <div class="test-duration">20ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">alternatives should have same or greater capacity</div>
+                            <div class="test-duration">16ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should return 400 for missing roomId</div>
+                            <div class="test-duration">5ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should return 404 for non-existent room</div>
+                            <div class="test-duration">8ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should accept array of faculty IDs</div>
+                            <div class="test-duration">15ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should return summary statistics</div>
+                            <div class="test-duration">15ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should return 400 for missing facultyIds</div>
+                            <div class="test-duration">6ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should return 400 for non-array input</div>
+                            <div class="test-duration">7ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should return 400 for empty array</div>
+                            <div class="test-duration">7ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                </div>
+            
+                <div class="suite">
+                    <div class="suite-name">analysis.test.js</div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should calculate correctly with updated weights</div>
+                            <div class="test-duration">2ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should cap score at 100</div>
+                            <div class="test-duration">2ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should handle custom weights</div>
+                            <div class="test-duration">0ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should handle zero classes</div>
+                            <div class="test-duration">0ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should handle zero students</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should handle decimal results</div>
+                            <div class="test-duration">0ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should handle large numbers</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should return number type</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should not return NaN</div>
+                            <div class="test-duration">0ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should be deterministic (same input = same output)</div>
+                            <div class="test-duration">0ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should return CRITICAL for score > 75</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should return HIGH for score 46-75</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should return MEDIUM for score <= 45</div>
+                            <div class="test-duration">0ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should handle boundary values correctly</div>
+                            <div class="test-duration">0ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should return string type</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should return uppercase severity</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should only return valid severities</div>
+                            <div class="test-duration">0ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should generate 5 recommendations for CRITICAL</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should generate 4 recommendations for HIGH</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should generate 3 recommendations for MEDIUM</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should include faculty name in recommendations</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should return array of strings</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should return non-empty recommendations</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">CRITICAL should mention Dean/emergency</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should not have duplicate recommendations</div>
+                            <div class="test-duration">0ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should handle unknown severity gracefully</div>
+                            <div class="test-duration">0ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should handle empty faculty name</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should accept valid ObjectId string</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should accept valid ObjectId object</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should reject invalid format</div>
+                            <div class="test-duration">0ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should reject null</div>
+                            <div class="test-duration">0ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should reject undefined</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should reject empty string</div>
+                            <div class="test-duration">0ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should reject numbers</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should reject objects</div>
+                            <div class="test-duration">0ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should handle negative numbers gracefully</div>
+                            <div class="test-duration">0ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should handle Infinity</div>
+                            <div class="test-duration">0ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should handle very large numbers</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should handle very small decimal values</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should handle mixed integer and decimal</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should maintain precision for normal values</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should not produce negative scores</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should handle boundary at 100</div>
+                            <div class="test-duration">0ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should calculate 10,000 scores in < 100ms</div>
+                            <div class="test-duration">39ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">should classify 10,000 severities in < 50ms</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">Part-time lecturer (1 class, 30 students) = MEDIUM impact</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">Popular professor (20 classes, 600 students) = HIGH</div>
+                            <div class="test-duration">0ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">Department head (20 classes, 800 students) = CRITICAL</div>
+                            <div class="test-duration">0ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">Average faculty (8 classes, 240 students) = MEDIUM</div>
+                            <div class="test-duration">1ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                        <div class="test-item">
+                            <div class="test-name">New faculty (3 classes, 90 students) = MEDIUM</div>
+                            <div class="test-duration">0ms</div>
+                            <div class="test-status status-passed">
+                                passed
+                            </div>
+                        </div>
+                    
+                </div>
+            
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>Generated by Test Report Generator v1.0.0</p>
+            <p style="margin-top: 10px; opacity: 0.8;">
+                Timetable Scheduling System © 2024
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+    

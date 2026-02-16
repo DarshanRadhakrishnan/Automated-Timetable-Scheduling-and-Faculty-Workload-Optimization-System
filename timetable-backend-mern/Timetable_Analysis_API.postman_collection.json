@@ -1,0 +1,156 @@
+{
+    "info": {
+        "_postman_id": "c1f2e3d4-a5b6-7c8d-9e0f-1a2b3c4d5e6f",
+        "name": "Timetable Impact Analysis API Tests",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Setup",
+            "item": [
+                {
+                    "name": "Get All Faculty IDs",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/faculty",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "faculty"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "pm.test('Response has faculty array', function() {",
+                                    "    const json = pm.response.json();",
+                                    "    if (Array.isArray(json) && json.length > 0) {",
+                                    "        pm.environment.set('testFacultyId', json[0]._id);",
+                                    "    } else if (json.faculty && Array.isArray(json.faculty)) {",
+                                    "         pm.environment.set('testFacultyId', json.faculty[0]._id);",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Faculty Impact Analysis",
+            "item": [
+                {
+                    "name": "Valid Faculty ID",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"facultyId\": \"{{testFacultyId}}\"}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/analysis/faculty-impact",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "analysis",
+                                "faculty-impact"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status is 200', () => {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "pm.test('Response has all required fields', () => {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json).to.have.property('metadata');",
+                                    "    pm.expect(json).to.have.property('faculty');",
+                                    "    pm.expect(json).to.have.property('impact');",
+                                    "    pm.expect(json).to.have.property('recommendations');",
+                                    "    pm.expect(json).to.have.property('affectedClasses');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Room Shortage Analysis",
+            "item": [
+                {
+                    "name": "Valid Room ID",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"roomId\": \"{{testRoomId}}\"}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/analysis/room-shortage",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "analysis",
+                                "room-shortage"
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:5000",
+            "type": "string"
+        },
+        {
+            "key": "testFacultyId",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "testRoomId",
+            "value": "",
+            "type": "string"
+        }
+    ]
+}
