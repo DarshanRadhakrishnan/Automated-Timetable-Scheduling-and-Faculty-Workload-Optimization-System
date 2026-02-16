@@ -60,27 +60,48 @@ const findSubstitutesForFaculty = async (facultyId, day, proposalId = 1) => {
         };
 
         // Strategy A: Find Substitutes (Same Slot, Different Faculty)
-        // Logic: Find faculties NOT busy at this slot AND not unavailable
+        // Logic: Return ALL faculties with status (Available/Occupied)
+        const allFaculties = await Faculty.find({ _id: { $ne: facultyId } });
+
         const busyAssignments = await Timetable.find({
             timeslotId: classEntry.timeslotId._id,
             proposalId: distinctProposalId
         }).select('facultyId');
-        const busyIds = busyAssignments.map(a => a.facultyId.toString());
+        const busyIds = new Set(busyAssignments.map(a => a.facultyId.toString()));
 
         const unavailableRecords = await FacultyAvailability.find({
             timeslotId: classEntry.timeslotId._id,
             isAvailable: false
         }).select('facultyId');
-        const unavailableIds = unavailableRecords.map(a => a.facultyId.toString());
+        const unavailableIds = new Set(unavailableRecords.map(a => a.facultyId.toString()));
 
-        const excluded = new Set([...busyIds, ...unavailableIds, facultyId.toString()]);
+        options.substitutes = allFaculties.map(f => {
+            let status = 'AVAILABLE';
+            let reason = 'Available';
 
-        const candidateFaculties = await Faculty.find({ _id: { $nin: Array.from(excluded) } });
-        options.substitutes = candidateFaculties.map(f => ({
-            _id: f._id,
-            name: f.name,
-            reason: 'Available at this slot'
-        }));
+            if (busyIds.has(f._id.toString())) {
+                status = 'OCCUPIED';
+                reason = 'Has another class';
+            } else if (unavailableIds.has(f._id.toString())) {
+                status = 'OCCUPIED';
+                reason = 'Marked unavailable';
+            }
+
+            return {
+                _id: f._id,
+                name: f.name,
+                department: f.department,
+                status: status,
+                reason: reason
+            };
+        });
+
+        // Sort: Available first
+        options.substitutes.sort((a, b) => {
+            if (a.status === 'AVAILABLE' && b.status !== 'AVAILABLE') return -1;
+            if (a.status !== 'AVAILABLE' && b.status === 'AVAILABLE') return 1;
+            return a.name.localeCompare(b.name);
+        });
 
         // Strategy B: Reschedule (Different Slot, Same Faculty? NO. Faculty is away.)
         // Unless we reschedule to a DIFFERENT DAY.
