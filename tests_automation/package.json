@@ -1,0 +1,19 @@
+{
+    "name": "timetable-tests",
+    "version": "1.0.0",
+    "description": "Automated test suite for Timetable Scheduling System",
+    "main": "index.js",
+    "scripts": {
+        "test": "jest",
+        "test:unit": "jest unit",
+        "test:integration": "jest integration"
+    },
+    "dependencies": {
+        "express": "^5.2.1",
+        "mongoose": "^8.0.0"
+    },
+    "devDependencies": {
+        "jest": "^29.7.0",
+        "supertest": "^6.3.3"
+    }
+}
