@@ -1,0 +1,479 @@
+﻿
+> timetable-backend-mern@1.0.0 test
+> cross-env NODE_ENV=test jest rankingEffectiveness.test.js
+
+  console.log
+    
+    Scenario 1 (Compactness):
+
+      at Object.log (tests/rankingEffectiveness.test.js:31:17)
+
+  console.log
+      Schedule A (Compact): 1016 (Compactness Bonus: 0.75)
+
+      at Object.log (tests/rankingEffectiveness.test.js:32:17)
+
+  console.log
+      Schedule B (Gaps):    1014 (Gap Penalty: -1.25)
+
+      at Object.log (tests/rankingEffectiveness.test.js:33:17)
+
+  console.log
+    
+    Scenario 2 (Workload Balance):
+
+      at Object.log (tests/rankingEffectiveness.test.js:54:17)
+
+  console.log
+      Schedule A (Balanced):   1021 (Penalty: 0)
+
+      at Object.log (tests/rankingEffectiveness.test.js:55:17)
+
+  console.log
+      Schedule B (Unbalanced): 1016 (Penalty: -6)
+
+      at Object.log (tests/rankingEffectiveness.test.js:56:17)
+
+  console.log
+    
+    Scenario 3 (Room Optimization):
+
+      at Object.log (tests/rankingEffectiveness.test.js:81:17)
+
+  console.log
+      Schedule A (Good Fit): 1015 (Util Score: 16.67)
+
+      at Object.log (tests/rankingEffectiveness.test.js:82:17)
+
+  console.log
+      Schedule B (Bad Fit):  1008 (Util Score: 10.00)
+
+      at Object.log (tests/rankingEffectiveness.test.js:83:17)
+
+  console.log
+    
+    Scenario 4 (Daily Overload):
+
+      at Object.log (tests/rankingEffectiveness.test.js:120:17)
+
+  console.log
+      Schedule A (4/day max): 1008 (Workload: -15)
+
+      at Object.log (tests/rankingEffectiveness.test.js:121:17)
+
+  console.log
+      Schedule B (5/day):     999 (Workload: -25)
+
+      at Object.log (tests/rankingEffectiveness.test.js:122:17)
+
+  console.log
+    
+    Scenario 5 (Multi-Day Distribution):
+
+      at Object.log (tests/rankingEffectiveness.test.js:160:17)
+
+  console.log
+      Schedule A (Spread): 1005 (Compactness: 2.25)
+
+      at Object.log (tests/rankingEffectiveness.test.js:161:17)
+
+  console.log
+      Schedule B (Same):   1005 (Compactness: 2.25)
+
+      at Object.log (tests/rankingEffectiveness.test.js:162:17)
+
+  console.log
+    
+    Scenario 6 (Gap Severity):
+
+      at Object.log (tests/rankingEffectiveness.test.js:194:17)
+
+  console.log
+      Schedule A (1 gap of 2): 1013 (Gap Score: -2.5)
+
+      at Object.log (tests/rankingEffectiveness.test.js:195:17)
+
+  console.log
+      Schedule B (2 gaps):     1008 (Gap Score: -3.75)
+
+      at Object.log (tests/rankingEffectiveness.test.js:196:17)
+
+  console.log
+    
+    Scenario 7 (Extreme Imbalance):
+
+      at Object.log (tests/rankingEffectiveness.test.js:237:17)
+
+  console.log
+      Schedule A (Balanced 2,2,2): 1023 (Workload: 0)
+
+      at Object.log (tests/rankingEffectiveness.test.js:238:17)
+
+  console.log
+      Schedule B (Imbalanced 6,0,0): 1007 (Workload: -16.97056274847714)
+
+      at Object.log (tests/rankingEffectiveness.test.js:239:17)
+
+  console.log
+    
+    Scenario 8 (Room Edge Cases):
+
+      at Object.log (tests/rankingEffectiveness.test.js:264:17)
+
+  console.log
+      Schedule A (100% util): 1018 (Room: 20.00)
+
+      at Object.log (tests/rankingEffectiveness.test.js:265:17)
+
+  console.log
+      Schedule B (98% util):  1018 (Room: 19.61)
+
+      at Object.log (tests/rankingEffectiveness.test.js:266:17)
+
+  console.log
+    
+    Scenario 9 (Combined Best vs Worst):
+
+      at Object.log (tests/rankingEffectiveness.test.js:304:17)
+
+  console.log
+      Schedule A (Optimized): 1021
+
+      at Object.log (tests/rankingEffectiveness.test.js:305:17)
+
+  console.log
+        - Workload: 0
+
+      at Object.log (tests/rankingEffectiveness.test.js:306:17)
+
+  console.log
+        - Gaps: 0
+
+      at Object.log (tests/rankingEffectiveness.test.js:307:17)
+
+  console.log
+        - Room: 18.46
+
+      at Object.log (tests/rankingEffectiveness.test.js:308:17)
+
+  console.log
+        - Compactness: 1.5
+
+      at Object.log (tests/rankingEffectiveness.test.js:309:17)
+
+  console.log
+      Schedule B (Poor): 997
+
+      at Object.log (tests/rankingEffectiveness.test.js:310:17)
+
+  console.log
+        - Workload: -12
+
+      at Object.log (tests/rankingEffectiveness.test.js:311:17)
+
+  console.log
+        - Gaps: -1.25
+
+      at Object.log (tests/rankingEffectiveness.test.js:312:17)
+
+  console.log
+        - Room: 8.00
+
+      at Object.log (tests/rankingEffectiveness.test.js:313:17)
+
+  console.log
+        - Compactness: 0.75
+
+      at Object.log (tests/rankingEffectiveness.test.js:314:17)
+
+  console.log
+    
+    Scenario 10 (Empty Schedule):
+
+      at Object.log (tests/rankingEffectiveness.test.js:323:17)
+
+  console.log
+      Score: 1001
+
+      at Object.log (tests/rankingEffectiveness.test.js:324:17)
+
+  console.log
+      Details: {
+      base: 1000,
+      workloadScore: -0,
+      gapScore: -0,
+      roomUtilScore: 0,
+      compactnessScore: 0,
+      preferenceScore: 1
+    }
+
+      at Object.log (tests/rankingEffectiveness.test.js:325:17)
+
+  console.log
+    
+    Scenario 11 (Single Entry):
+
+      at Object.log (tests/rankingEffectiveness.test.js:341:17)
+
+  console.log
+      Score: 1018
+
+      at Object.log (tests/rankingEffectiveness.test.js:342:17)
+
+  console.log
+      Details: {
+      base: 1000,
+      workloadScore: -3,
+      gapScore: -0,
+      roomUtilScore: 20,
+      compactnessScore: 0,
+      preferenceScore: 1
+    }
+
+      at Object.log (tests/rankingEffectiveness.test.js:343:17)
+
+  console.log
+    
+    Scenario 12 (Perfect Compactness):
+
+      at Object.log (tests/rankingEffectiveness.test.js:371:17)
+
+  console.log
+      Score: 999
+
+      at Object.log (tests/rankingEffectiveness.test.js:372:17)
+
+  console.log
+      Compactness: 3 (4 consecutive pairs)
+
+      at Object.log (tests/rankingEffectiveness.test.js:373:17)
+
+  console.log
+      Gaps: 0 (should be 0)
+
+      at Object.log (tests/rankingEffectiveness.test.js:374:17)
+
+node.exe : FAIL tests/ranking
+Effectiveness.test.js
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (FAIL te  
+  sts/rankingEffectiveness   
+ .test.js:String) [], Rem    
+oteException
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+  Timetable Ranking 
+Effectiveness
+    ΓêÜ Scenario 1: Compact 
+Schedule vs Schedule with 
+Gaps (61 ms)
+    ΓêÜ Scenario 2: Balanced 
+Workload vs Unbalanced 
+Workload (7 ms)
+    ΓêÜ Scenario 3: Room 
+Utilization (Optimized vs 
+Wasteful) (6 ms)
+    ΓêÜ Scenario 4: Daily 
+Overload Penalty (6 ms)
+    ΓêÜ Scenario 5: 
+Multi-Day Distribution vs 
+Concentrated (8 ms)
+    ΓêÜ Scenario 6: Multiple 
+Gaps vs Single Gap (6 ms)
+    ΓêÜ Scenario 7: Extreme 
+Workload Imbalance (5 ms)
+    ├ù Scenario 8: Room 
+Capacity Edge Cases (7 ms)
+    ΓêÜ Scenario 9: Combined 
+Optimization (Best vs Worst) 
+(19 ms)
+    ├ù Scenario 10: Edge 
+Case - Empty Schedule (8 ms)
+    ├ù Scenario 11: Edge 
+Case - Single Entry (5 ms)
+    ├ù Scenario 12: Perfect 
+Compactness (All 
+Consecutive) (8 ms)
+
+  ΓùÅ Timetable Ranking 
+Effectiveness ΓÇ║ Scenario 
+8: Room Capacity Edge Cases
+
+    expect(received).toBeGrea
+terThan(expected)
+
+    Expected: > 1018
+    Received:   1018
+
+    [0m [90m 266 |[39m    
+     
+console[33m.[39mlog([32m` 
+ Schedule B (98% util):  
+${scoreB.total} (Room: ${scor
+eB.details.roomUtilScore.toFi
+xed(2)})`[39m)[33m;[39m
+     [90m 267 |[39m
+    
+[31m[1m>[22m[39m[90m 
+268 |[39m         expect(sco
+reA[33m.[39mtotal)[33m.[3
+9mtoBeGreaterThan(scoreB[33m
+.[39mtotal)[33m;[39m
+     [90m     |[39m        
+                      
+[31m[1m^[22m[39m
+     [90m 269 |[39m     
+})[33m;[39m
+     [90m 270 |[39m
+     [90m 271 |[39m     
+it([32m'Scenario 9: 
+Combined Optimization (Best 
+vs Worst)'[39m[33m,[39m 
+() [33m=>[39m {[0m
+
+      at 
+Object.toBeGreaterThan (tests
+/rankingEffectiveness.test.js
+:268:30)
+
+  ΓùÅ Timetable Ranking 
+Effectiveness ΓÇ║ Scenario 
+10: Edge Case - Empty 
+Schedule
+
+    expect(received).toBe(exp
+ected) // Object.is equality
+
+    Expected: 0
+    Received: -0
+
+    [0m [90m 327 |[39m    
+     [90m// Empty schedule 
+should have base score + 
+preference bonus[39m
+     [90m 328 |[39m        
+ expect(score[33m.[39mtotal
+)[33m.[39mtoBeGreaterThan(
+[35m0[39m)[33m;[39m
+    
+[31m[1m>[22m[39m[90m 
+329 |[39m         expect(sco
+re[33m.[39mdetails[33m.[3
+9mworkloadScore)[33m.[39mto
+Be([35m0[39m)[33m;[39m
+     [90m     |[39m        
+                             
+        [31m[1m^[22m[39m
+     [90m 330 |[39m        
+ expect(score[33m.[39mdetai
+ls[33m.[39mgapScore)[33m.
+[39mtoBe([35m0[39m)[33m;[
+39m
+     [90m 331 |[39m        
+ expect(score[33m.[39mdetai
+ls[33m.[39mcompactnessScore
+)[33m.[39mtoBe([35m0[39m)
+[33m;[39m
+     [90m 332 |[39m     
+})[33m;[39m[0m
+
+      at Object.toBe (tests/r
+ankingEffectiveness.test.js:3
+29:45)
+
+  ΓùÅ Timetable Ranking 
+Effectiveness ΓÇ║ Scenario 
+11: Edge Case - Single Entry
+
+    expect(received).toBe(exp
+ected) // Object.is equality
+
+    Expected: 0
+    Received: -0
+
+    [0m [90m 344 |[39m
+     [90m 345 |[39m        
+ [90m// Single entry should 
+have no gaps, no compactness 
+bonus[39m
+    
+[31m[1m>[22m[39m[90m 
+346 |[39m         expect(sco
+re[33m.[39mdetails[33m.[3
+9mgapScore)[33m.[39mtoBe([
+35m0[39m)[33m;[39m
+     [90m     |[39m        
+                             
+   [31m[1m^[22m[39m
+     [90m 347 |[39m        
+ expect(score[33m.[39mdetai
+ls[33m.[39mcompactnessScore
+)[33m.[39mtoBe([35m0[39m)
+[33m;[39m
+     [90m 348 |[39m        
+ expect(score[33m.[39mtotal
+)[33m.[39mtoBeGreaterThan(
+[35m0[39m)[33m;[39m
+     [90m 349 |[39m     
+})[33m;[39m[0m
+
+      at Object.toBe (tests/r
+ankingEffectiveness.test.js:3
+46:40)
+
+  ΓùÅ Timetable Ranking 
+Effectiveness ΓÇ║ Scenario 
+12: Perfect Compactness (All 
+Consecutive)
+
+    expect(received).toBe(exp
+ected) // Object.is equality
+
+    Expected: 0
+    Received: -0
+
+    [0m [90m 375 |[39m
+     [90m 376 |[39m        
+ [90m// 4 consecutive 
+pairs, no gaps[39m
+    
+[31m[1m>[22m[39m[90m 
+377 |[39m         expect(sco
+re[33m.[39mdetails[33m.[3
+9mgapScore)[33m.[39mtoBe([
+35m0[39m)[33m;[39m
+     [90m     |[39m        
+                             
+   [31m[1m^[22m[39m
+     [90m 378 |[39m        
+ expect(score[33m.[39mdetai
+ls[33m.[39mcompactnessScore
+)[33m.[39mtoBeGreaterThan(
+[35m0[39m)[33m;[39m
+     [90m 379 |[39m     
+})[33m;[39m
+     [90m 380 |[39m 
+})[33m;[39m[0m
+
+      at Object.toBe (tests/r
+ankingEffectiveness.test.js:3
+77:40)
+
+Test Suites: 1 failed, 1 
+total
+Tests:       4 failed, 8 
+passed, 12 total
+Snapshots:   0 total
+Time:        1.43 s, 
+estimated 2 s
+Ran all test suites matching 
+rankingEffectiveness.test.js.

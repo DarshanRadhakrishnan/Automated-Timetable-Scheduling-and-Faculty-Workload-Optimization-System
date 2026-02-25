@@ -31,6 +31,10 @@ const timetableSchema = new mongoose.Schema({
         required: true,
         default: 1
     },
+    score: {
+        type: Number,
+        default: 0
+    },
 }, {
     timestamps: true,
 });

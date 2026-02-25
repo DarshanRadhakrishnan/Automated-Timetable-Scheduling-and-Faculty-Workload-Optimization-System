@@ -9,11 +9,17 @@ const detectConflicts = async (proposalId) => {
 
     const conflicts = [];
     const query = proposalId ? { proposalId } : {};
-    const entries = await Timetable.find(query);
+    const entries = await Timetable.find(query)
+        .populate('facultyId')
+        .populate('roomId')
+        .populate('sectionId')
+        .populate('timeslotId');
 
     for (const entry of entries) {
+        if (!entry.timeslotId) continue; // Skip if timeslot missing
+
         const baseQuery = {
-            timeslotId: entry.timeslotId,
+            timeslotId: entry.timeslotId._id,
             // Optimization: Only look for conflicts with ID > current ID to avoid A-B / B-A duplicates
             _id: { $gt: entry._id },
         };
@@ -24,51 +30,67 @@ const detectConflicts = async (proposalId) => {
         }
 
         // Faculty conflict
-        const facultyConflict = await Timetable.findOne({
-            ...baseQuery,
-            facultyId: entry.facultyId,
-        });
-
-        if (facultyConflict) {
-            conflicts.push({
-                type: 'faculty',
-                entityId: entry.facultyId,
-                timeslotId: entry.timeslotId,
-                reason: `Faculty double booked in proposal ${entry.proposalId}`,
-                proposalId: entry.proposalId
+        // Check if faculty exists (populated)
+        if (entry.facultyId) {
+            const facultyConflict = await Timetable.findOne({
+                ...baseQuery,
+                facultyId: entry.facultyId._id,
             });
+
+            if (facultyConflict) {
+                const timeStr = `${entry.timeslotId.day} ${entry.timeslotId.startTime}-${entry.timeslotId.endTime}`;
+                conflicts.push({
+                    type: 'faculty',
+                    entityId: entry.facultyId._id,
+                    entityName: entry.facultyId.name,
+                    timeslotId: entry.timeslotId._id,
+                    timeslotLabel: timeStr,
+                    reason: `Faculty ${entry.facultyId.name} is double booked at ${timeStr}`,
+                    proposalId: entry.proposalId || null
+                });
+            }
         }
 
         // Room conflict
-        const roomConflict = await Timetable.findOne({
-            ...baseQuery,
-            roomId: entry.roomId,
-        });
-
-        if (roomConflict) {
-            conflicts.push({
-                type: 'room',
-                entityId: entry.roomId,
-                timeslotId: entry.timeslotId,
-                reason: `Room double booked in proposal ${entry.proposalId}`,
-                proposalId: entry.proposalId
+        if (entry.roomId) {
+            const roomConflict = await Timetable.findOne({
+                ...baseQuery,
+                roomId: entry.roomId._id,
             });
+
+            if (roomConflict) {
+                const timeStr = `${entry.timeslotId.day} ${entry.timeslotId.startTime}-${entry.timeslotId.endTime}`;
+                conflicts.push({
+                    type: 'room',
+                    entityId: entry.roomId._id,
+                    entityName: `${entry.roomId.name} (${entry.roomId.roomType})`,
+                    timeslotId: entry.timeslotId._id,
+                    timeslotLabel: timeStr,
+                    reason: `Room ${entry.roomId.name} is double booked at ${timeStr}`,
+                    proposalId: entry.proposalId || null
+                });
+            }
         }
 
         // Section conflict
-        const sectionConflict = await Timetable.findOne({
-            ...baseQuery,
-            sectionId: entry.sectionId,
-        });
-
-        if (sectionConflict) {
-            conflicts.push({
-                type: 'section',
-                entityId: entry.sectionId,
-                timeslotId: entry.timeslotId,
-                reason: `Section ${entry.sectionId} has concurrent classes`,
-                proposalId: entry.proposalId
+        if (entry.sectionId) {
+            const sectionConflict = await Timetable.findOne({
+                ...baseQuery,
+                sectionId: entry.sectionId._id,
             });
+
+            if (sectionConflict) {
+                const timeStr = `${entry.timeslotId.day} ${entry.timeslotId.startTime}-${entry.timeslotId.endTime}`;
+                conflicts.push({
+                    type: 'section',
+                    entityId: entry.sectionId._id,
+                    entityName: entry.sectionId.name,
+                    timeslotId: entry.timeslotId._id,
+                    timeslotLabel: timeStr,
+                    reason: `Section ${entry.sectionId.name} has concurrent classes at ${timeStr}`,
+                    proposalId: entry.proposalId || null
+                });
+            }
         }
     }
 

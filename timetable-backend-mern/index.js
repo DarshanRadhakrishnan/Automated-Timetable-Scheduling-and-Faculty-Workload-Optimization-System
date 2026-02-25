@@ -6,12 +6,17 @@ const connectDB = require('./config/database');
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Connect to MongoDB
-connectDB();
+// Connect to MongoDB handled in startup or tests
 
 // Routes
 app.use('/api/faculty', require('./routes/faculty'));
@@ -24,6 +29,9 @@ app.use('/api/timetable', require('./routes/timetable'));
 app.use('/api/conflicts', require('./conflicts'));
 app.use('/api/rescheduling', require('./routes/rescheduling'));
 app.use('/api/simulation', require('./routes/simulation'));
+app.use('/api/analysis', require('./routes/analysis'));
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/auditlog', require('./routes/auditlog'));
 
 // Health check
 app.get('/', (req, res) => {
@@ -44,6 +52,11 @@ app.get('/', (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+if (require.main === module) {
+    connectDB();
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+}
+
+module.exports = app;

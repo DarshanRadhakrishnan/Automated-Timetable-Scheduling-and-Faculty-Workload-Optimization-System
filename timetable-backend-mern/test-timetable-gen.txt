@@ -1,0 +1,80 @@
+﻿
+> timetable-backend-mern@1.0.0 test
+> cross-env NODE_ENV=test jest timetableGenerator
+
+node.exe : FAIL tests/timetab
+leGenerator.test.js
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (FAIL te  
+  sts/timetableGenerator.t   
+ est.js:String) [], Remot    
+eException
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+  Timetable Scoring System
+    ├ù should calculate a 
+perfect score for an ideal 
+schedule (17 ms)
+    ΓêÜ should penalize gaps 
+in the schedule (3 ms)
+    ΓêÜ should penalize 
+uneven workload (2 ms)
+
+  ΓùÅ Timetable Scoring 
+System ΓÇ║ should calculate 
+a perfect score for an ideal 
+schedule
+
+    expect(received).toBeGrea
+terThan(expected)
+
+    Expected: > 0
+    Received:   0
+
+    [0m [90m 28 |[39m
+     [90m 29 |[39m         
+expect(result[33m.[39mtotal
+)[33m.[39mtoBeGreaterThan(
+[35m1000[39m)[33m;[39m
+    
+[31m[1m>[22m[39m[90m 30 
+|[39m         expect(result
+[33m.[39mdetails[33m.[39mc
+ompactnessScore)[33m.[39mto
+BeGreaterThan([35m0[39m)[3
+3m;[39m
+     [90m    |[39m         
+                             
+           
+[31m[1m^[22m[39m
+     [90m 31 |[39m         
+expect(result[33m.[39mdetai
+ls[33m.[39mroomUtilScore)[
+33m.[39mtoBeGreaterThan([35
+m0[39m)[33m;[39m
+     [90m 32 |[39m     
+})[33m;[39m
+     [90m 33 |[39m[0m
+
+      at 
+Object.toBeGreaterThan (tests
+/timetableGenerator.test.js:3
+0:49)
+
+Test Suites: 1 failed, 1 
+total
+Tests:       1 failed, 2 
+passed, 3 total
+Snapshots:   0 total
+Time:        4.087 s
+Ran all test suites matching 
+timetableGenerator.
