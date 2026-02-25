@@ -20,6 +20,18 @@ const UserSchema = new mongoose.Schema({
         enum: ['admin', 'faculty', 'student'],
         default: 'student'
     },
+    // For students: links to their Section (class group)
+    sectionId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Section',
+        default: null
+    },
+    // For faculty: links to their Faculty profile
+    facultyId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Faculty',
+        default: null
+    },
     createdAt: {
         type: Date,
         default: Date.now

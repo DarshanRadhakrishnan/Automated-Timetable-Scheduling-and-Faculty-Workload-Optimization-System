@@ -1,0 +1,253 @@
+{
+    "info": {
+        "_postman_id": "conflict-detection-resolution-api",
+        "name": "Conflict Detection & Resolution API",
+        "description": "Complete API testing collection for Timetable Conflict Detection and Resolution features",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "1. Setup - Generate Timetable",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "raw": "http://localhost:5000/api/timetable/generate",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "5000",
+                    "path": [
+                        "api",
+                        "timetable",
+                        "generate"
+                    ]
+                },
+                "description": "Generates a new timetable with test data. Run this first to create data for conflict testing."
+            },
+            "response": []
+        },
+        {
+            "name": "2. Detect Conflicts (Body)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"proposalId\": 1\n}"
+                },
+                "url": {
+                    "raw": "http://localhost:5000/api/timetable/conflicts/detect",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "5000",
+                    "path": [
+                        "api",
+                        "timetable",
+                        "conflicts",
+                        "detect"
+                    ]
+                },
+                "description": "Detects all conflicts (faculty, room, section double-bookings) in the timetable for proposalId=1"
+            },
+            "response": []
+        },
+        {
+            "name": "3. Detect Conflicts (Query Param)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "raw": "http://localhost:5000/api/timetable/conflicts/detect?proposalId=1",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "5000",
+                    "path": [
+                        "api",
+                        "timetable",
+                        "conflicts",
+                        "detect"
+                    ],
+                    "query": [
+                        {
+                            "key": "proposalId",
+                            "value": "1"
+                        }
+                    ]
+                },
+                "description": "Alternative way to detect conflicts using query parameter instead of body"
+            },
+            "response": []
+        },
+        {
+            "name": "4. Resolve Conflicts",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"proposalId\": 1\n}"
+                },
+                "url": {
+                    "raw": "http://localhost:5000/api/timetable/conflicts/resolve?proposalId=1",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "5000",
+                    "path": [
+                        "api",
+                        "timetable",
+                        "conflicts",
+                        "resolve"
+                    ],
+                    "query": [
+                        {
+                            "key": "proposalId",
+                            "value": "1"
+                        }
+                    ]
+                },
+                "description": "Automatically resolves detected conflicts by rescheduling classes or changing rooms. Returns detailed resolution log."
+            },
+            "response": []
+        },
+        {
+            "name": "5. Verify Resolution (Detect Again)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"proposalId\": 1\n}"
+                },
+                "url": {
+                    "raw": "http://localhost:5000/api/timetable/conflicts/detect",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "5000",
+                    "path": [
+                        "api",
+                        "timetable",
+                        "conflicts",
+                        "detect"
+                    ]
+                },
+                "description": "Run this after resolution to verify conflicts are fixed. Should return count: 0"
+            },
+            "response": []
+        },
+        {
+            "name": "6. Test Validation - Missing ProposalId",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{}"
+                },
+                "url": {
+                    "raw": "http://localhost:5000/api/timetable/conflicts/resolve",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "5000",
+                    "path": [
+                        "api",
+                        "timetable",
+                        "conflicts",
+                        "resolve"
+                    ]
+                },
+                "description": "Tests validation - should return 400 error with message 'proposalId is required'"
+            },
+            "response": []
+        },
+        {
+            "name": "7. Get All Timetable Entries",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "http://localhost:5000/api/timetable?proposalId=1",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "5000",
+                    "path": [
+                        "api",
+                        "timetable"
+                    ],
+                    "query": [
+                        {
+                            "key": "proposalId",
+                            "value": "1"
+                        }
+                    ]
+                },
+                "description": "Retrieves all timetable entries for proposalId=1 to see the current schedule"
+            },
+            "response": []
+        },
+        {
+            "name": "8. Clear All Timetable Data",
+            "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                    "raw": "http://localhost:5000/api/timetable",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "5000",
+                    "path": [
+                        "api",
+                        "timetable"
+                    ]
+                },
+                "description": "Deletes all timetable entries. Use this to reset and start fresh testing."
+            },
+            "response": []
+        }
+    ]
+}

@@ -32,6 +32,8 @@ app.use('/api/simulation', require('./routes/simulation'));
 app.use('/api/analysis', require('./routes/analysis'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/auditlog', require('./routes/auditlog'));
+app.use('/api/student', require('./routes/student'));
+app.use('/api/admin', require('./routes/admin'));
 
 // Health check
 app.get('/', (req, res) => {
@@ -45,7 +47,11 @@ app.get('/', (req, res) => {
             section: '/api/section',
             timeslot: '/api/timeslot',
             availability: '/api/availability',
-            timetable: '/api/timetable'
+            timetable: '/api/timetable',
+            auth: '/api/auth',
+            student: '/api/student',
+            admin: '/api/admin',
+            auditlog: '/api/auditlog'
         }
     });
 });

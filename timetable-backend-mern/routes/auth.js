@@ -1,21 +1,175 @@
 const router = require('express').Router();
 const User = require('../models/User');
+const Faculty = require('../models/Faculty');
+const Section = require('../models/Section');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { verifyToken, authorize } = require('../middleware/auth');
 
-// REGISTER
+// ─────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────
+
+const hashPassword = async (password) => {
+    const salt = await bcrypt.genSalt(10);
+    return bcrypt.hash(password, salt);
+};
+
+const signToken = (user) =>
+    jwt.sign(
+        { id: user._id, role: user.role },
+        process.env.JWT_SECRET || 'secretKey',
+        { expiresIn: '5d' }
+    );
+
+// ─────────────────────────────────────────────
+// REGISTER — STUDENT
+// POST /api/auth/register/student
+// Body: { username, email, password, sectionId }
+// ─────────────────────────────────────────────
+router.post('/register/student', async (req, res) => {
+    try {
+        const { username, email, password, sectionId } = req.body;
+
+        if (!username || !email || !password || !sectionId) {
+            return res.status(400).json({ message: 'username, email, password, and sectionId are required.' });
+        }
+
+        // Validate the section exists
+        const section = await Section.findById(sectionId);
+        if (!section) {
+            return res.status(404).json({ message: `Section with id "${sectionId}" not found.` });
+        }
+
+        const hashedPassword = await hashPassword(password);
+        const newUser = new User({
+            username,
+            email,
+            password: hashedPassword,
+            role: 'student',
+            sectionId
+        });
+
+        const user = await newUser.save();
+        const accessToken = signToken(user);
+        const { password: _p, ...userInfo } = user._doc;
+
+        res.status(201).json({
+            message: 'Student registered successfully.',
+            user: { ...userInfo, section: { _id: section._id, name: section.name } },
+            accessToken
+        });
+    } catch (err) {
+        if (err.code === 11000) {
+            return res.status(409).json({ message: 'Email or username already in use.' });
+        }
+        res.status(500).json({ message: 'Registration failed.', error: err.message });
+    }
+});
+
+// ─────────────────────────────────────────────
+// REGISTER — FACULTY
+// POST /api/auth/register/faculty
+// Body: { username, email, password, facultyId }
+// ─────────────────────────────────────────────
+router.post('/register/faculty', async (req, res) => {
+    try {
+        const { username, email, password, facultyId } = req.body;
+
+        if (!username || !email || !password || !facultyId) {
+            return res.status(400).json({ message: 'username, email, password, and facultyId are required.' });
+        }
+
+        // Validate the faculty profile exists
+        const facultyProfile = await Faculty.findById(facultyId);
+        if (!facultyProfile) {
+            return res.status(404).json({ message: `Faculty profile with id "${facultyId}" not found.` });
+        }
+
+        // Prevent one faculty profile from having multiple user accounts
+        const existing = await User.findOne({ facultyId });
+        if (existing) {
+            return res.status(409).json({ message: 'A user account already exists for this faculty profile.' });
+        }
+
+        const hashedPassword = await hashPassword(password);
+        const newUser = new User({
+            username,
+            email,
+            password: hashedPassword,
+            role: 'faculty',
+            facultyId
+        });
+
+        const user = await newUser.save();
+        const accessToken = signToken(user);
+        const { password: _p, ...userInfo } = user._doc;
+
+        res.status(201).json({
+            message: 'Faculty user registered successfully.',
+            user: { ...userInfo, facultyProfile: { _id: facultyProfile._id, name: facultyProfile.name, department: facultyProfile.department } },
+            accessToken
+        });
+    } catch (err) {
+        if (err.code === 11000) {
+            return res.status(409).json({ message: 'Email or username already in use.' });
+        }
+        res.status(500).json({ message: 'Registration failed.', error: err.message });
+    }
+});
+
+// ─────────────────────────────────────────────
+// REGISTER — ADMIN  (protected: existing admin only)
+// POST /api/auth/register/admin
+// Headers: Authorization: Bearer <token>
+// Body: { username, email, password }
+// ─────────────────────────────────────────────
+router.post('/register/admin', verifyToken, authorize(['admin']), async (req, res) => {
+    try {
+        const { username, email, password } = req.body;
+
+        if (!username || !email || !password) {
+            return res.status(400).json({ message: 'username, email, and password are required.' });
+        }
+
+        const hashedPassword = await hashPassword(password);
+        const newUser = new User({
+            username,
+            email,
+            password: hashedPassword,
+            role: 'admin'
+        });
+
+        const user = await newUser.save();
+        const { password: _p, ...userInfo } = user._doc;
+
+        res.status(201).json({
+            message: 'Admin user registered successfully.',
+            user: userInfo
+        });
+    } catch (err) {
+        if (err.code === 11000) {
+            return res.status(409).json({ message: 'Email or username already in use.' });
+        }
+        res.status(500).json({ message: 'Registration failed.', error: err.message });
+    }
+});
+
+// ─────────────────────────────────────────────
+// LEGACY generic register (kept for backward compat, defaults to student)
+// POST /api/auth/register
+// ─────────────────────────────────────────────
 router.post('/register', async (req, res) => {
     try {
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(req.body.password, salt);
-
+        const hashedPassword = await hashPassword(req.body.password);
         const newUser = new User({
             username: req.body.username,
             email: req.body.email,
             password: hashedPassword,
-            role: req.body.role || 'student'
+            role: req.body.role || 'student',
+            sectionId: req.body.sectionId || null,
+            facultyId: req.body.facultyId || null
         });
-
         const user = await newUser.save();
         res.status(200).json(user);
     } catch (err) {
@@ -23,25 +177,43 @@ router.post('/register', async (req, res) => {
     }
 });
 
+// ─────────────────────────────────────────────
 // LOGIN
+// POST /api/auth/login
+// Body: { email, password }
+// ─────────────────────────────────────────────
 router.post('/login', async (req, res) => {
     try {
         const user = await User.findOne({ email: req.body.email });
-        !user && res.status(404).json("User not found");
+        if (!user) return res.status(404).json({ message: 'User not found.' });
 
         const validPassword = await bcrypt.compare(req.body.password, user.password);
-        !validPassword && res.status(400).json("Wrong password");
+        if (!validPassword) return res.status(400).json({ message: 'Wrong password.' });
 
-        const accessToken = jwt.sign(
-            { id: user._id, role: user.role },
-            process.env.JWT_SECRET || 'secretKey',
-            { expiresIn: "5d" }
-        );
-
+        const accessToken = signToken(user);
         const { password, ...others } = user._doc;
         res.status(200).json({ ...others, accessToken });
     } catch (err) {
         res.status(500).json(err);
+    }
+});
+
+// ─────────────────────────────────────────────
+// GET CURRENT USER PROFILE
+// GET /api/auth/me
+// Headers: Authorization: Bearer <token>
+// ─────────────────────────────────────────────
+router.get('/me', verifyToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id)
+            .select('-password')
+            .populate('sectionId', 'name program batch studentCount')
+            .populate('facultyId', 'name email department maxLoad');
+
+        if (!user) return res.status(404).json({ message: 'User not found.' });
+        res.json({ success: true, data: user });
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to fetch profile.', error: err.message });
     }
 });
 

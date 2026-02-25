@@ -32,10 +32,9 @@ echo       [OK] Backend window launched.
 echo.
 
 :: ─── Step 3: Wait for backend to be ready ───
-echo [3/5] Waiting for backend to initialise (8 seconds)...
+echo [3/5] Waiting for backend to initialise...
 timeout /t 8 /nobreak >nul
 
-:: Check if backend is actually up
 :check_backend
 netstat -aon 2>nul | findstr ":5000 " | findstr "LISTENING" >nul
 if errorlevel 1 (
@@ -53,7 +52,7 @@ echo       [OK] Frontend window launched.
 echo.
 
 :: ─── Step 5: Wait for frontend then open browser ───
-echo [5/5] Waiting for frontend to compile (20 seconds)...
+echo [5/5] Waiting for frontend to compile...
 timeout /t 20 /nobreak >nul
 
 :check_frontend
@@ -81,7 +80,7 @@ echo.
 echo   Login    : admin@timetable.com
 echo   Password : Admin@123
 echo.
-echo   Close the "Backend" and "Frontend" terminal windows
+echo   Close the Backend and Frontend terminal windows
 echo   to stop the servers.
 echo ============================================================
 echo.
