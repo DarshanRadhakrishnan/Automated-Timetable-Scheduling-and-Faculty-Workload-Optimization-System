@@ -1,0 +1,518 @@
+﻿
+> timetable-backend-mern@1.0.0 test
+> cross-env NODE_ENV=test jest rankingEffectiveness.test.js
+
+  console.log
+    
+    Scenario 1 (Compactness):
+
+      at Object.log (tests/rankingEffectiveness.test.js:31:17)
+
+  console.log
+      Schedule A (Compact): 1016 (Compactness Bonus: 0.75)
+
+      at Object.log (tests/rankingEffectiveness.test.js:32:17)
+
+  console.log
+      Schedule B (Gaps):    1014 (Gap Penalty: -1.25)
+
+      at Object.log (tests/rankingEffectiveness.test.js:33:17)
+
+  console.log
+    
+    Scenario 2 (Workload Balance):
+
+      at Object.log (tests/rankingEffectiveness.test.js:54:17)
+
+  console.log
+      Schedule A (Balanced):   1021 (Penalty: 0)
+
+      at Object.log (tests/rankingEffectiveness.test.js:55:17)
+
+  console.log
+      Schedule B (Unbalanced): 1016 (Penalty: -6)
+
+      at Object.log (tests/rankingEffectiveness.test.js:56:17)
+
+  console.log
+    
+    Scenario 3 (Room Optimization):
+
+      at Object.log (tests/rankingEffectiveness.test.js:81:17)
+
+  console.log
+      Schedule A (Good Fit): 1015 (Util Score: 16.67)
+
+      at Object.log (tests/rankingEffectiveness.test.js:82:17)
+
+  console.log
+      Schedule B (Bad Fit):  1008 (Util Score: 10.00)
+
+      at Object.log (tests/rankingEffectiveness.test.js:83:17)
+
+  console.log
+    
+    Scenario 4 (Daily Overload):
+
+      at Object.log (tests/rankingEffectiveness.test.js:120:17)
+
+  console.log
+      Schedule A (4/day max): 1008 (Workload: -15)
+
+      at Object.log (tests/rankingEffectiveness.test.js:121:17)
+
+  console.log
+      Schedule B (5/day):     999 (Workload: -25)
+
+      at Object.log (tests/rankingEffectiveness.test.js:122:17)
+
+  console.log
+    
+    Scenario 5 (Multi-Day Distribution):
+
+      at Object.log (tests/rankingEffectiveness.test.js:160:17)
+
+  console.log
+      Schedule A (Spread): 1005 (Compactness: 2.25)
+
+      at Object.log (tests/rankingEffectiveness.test.js:161:17)
+
+  console.log
+      Schedule B (Same):   1005 (Compactness: 2.25)
+
+      at Object.log (tests/rankingEffectiveness.test.js:162:17)
+
+  console.log
+    
+    Scenario 6 (Gap Severity):
+
+      at Object.log (tests/rankingEffectiveness.test.js:194:17)
+
+  console.log
+      Schedule A (1 gap of 2): 1013 (Gap Score: -2.5)
+
+      at Object.log (tests/rankingEffectiveness.test.js:195:17)
+
+  console.log
+      Schedule B (2 gaps):     1008 (Gap Score: -3.75)
+
+      at Object.log (tests/rankingEffectiveness.test.js:196:17)
+
+  console.log
+    
+    Scenario 7 (Extreme Imbalance):
+
+      at Object.log (tests/rankingEffectiveness.test.js:237:17)
+
+  console.log
+      Schedule A (Balanced 2,2,2): 1023 (Workload: 0)
+
+      at Object.log (tests/rankingEffectiveness.test.js:238:17)
+
+  console.log
+      Schedule B (Imbalanced 6,0,0): 1007 (Workload: -16.97056274847714)
+
+      at Object.log (tests/rankingEffectiveness.test.js:239:17)
+
+  console.log
+    
+    Scenario 8 (Room Edge Cases):
+
+      at Object.log (tests/rankingEffectiveness.test.js:264:17)
+
+  console.log
+      Schedule A (100% util): 1018 (Room: 20.00)
+
+      at Object.log (tests/rankingEffectiveness.test.js:265:17)
+
+  console.log
+      Schedule B (83% util):  1015 (Room: 16.67)
+
+      at Object.log (tests/rankingEffectiveness.test.js:266:17)
+
+  console.log
+    
+    Scenario 9 (Combined Best vs Worst):
+
+      at Object.log (tests/rankingEffectiveness.test.js:304:17)
+
+  console.log
+      Schedule A (Optimized): 1021
+
+      at Object.log (tests/rankingEffectiveness.test.js:305:17)
+
+  console.log
+        - Workload: 0
+
+      at Object.log (tests/rankingEffectiveness.test.js:306:17)
+
+  console.log
+        - Gaps: 0
+
+      at Object.log (tests/rankingEffectiveness.test.js:307:17)
+
+  console.log
+        - Room: 18.46
+
+      at Object.log (tests/rankingEffectiveness.test.js:308:17)
+
+  console.log
+        - Compactness: 1.5
+
+      at Object.log (tests/rankingEffectiveness.test.js:309:17)
+
+  console.log
+      Schedule B (Poor): 997
+
+      at Object.log (tests/rankingEffectiveness.test.js:310:17)
+
+  console.log
+        - Workload: -12
+
+      at Object.log (tests/rankingEffectiveness.test.js:311:17)
+
+  console.log
+        - Gaps: -1.25
+
+      at Object.log (tests/rankingEffectiveness.test.js:312:17)
+
+  console.log
+        - Room: 8.00
+
+      at Object.log (tests/rankingEffectiveness.test.js:313:17)
+
+  console.log
+        - Compactness: 0.75
+
+      at Object.log (tests/rankingEffectiveness.test.js:314:17)
+
+  console.log
+    
+    Scenario 10 (Empty Schedule):
+
+      at Object.log (tests/rankingEffectiveness.test.js:323:17)
+
+  console.log
+      Score: 1001
+
+      at Object.log (tests/rankingEffectiveness.test.js:324:17)
+
+  console.log
+      Details: {
+      base: 1000,
+      workloadScore: -0,
+      gapScore: -0,
+      roomUtilScore: 0,
+      compactnessScore: 0,
+      preferenceScore: 1
+    }
+
+      at Object.log (tests/rankingEffectiveness.test.js:325:17)
+
+  console.log
+    
+    Scenario 11 (Single Entry):
+
+      at Object.log (tests/rankingEffectiveness.test.js:341:17)
+
+  console.log
+      Score: 1018
+
+      at Object.log (tests/rankingEffectiveness.test.js:342:17)
+
+  console.log
+      Details: {
+      base: 1000,
+      workloadScore: -3,
+      gapScore: -0,
+      roomUtilScore: 20,
+      compactnessScore: 0,
+      preferenceScore: 1
+    }
+
+      at Object.log (tests/rankingEffectiveness.test.js:343:17)
+
+  console.log
+    
+    Scenario 12 (Perfect Compactness):
+
+      at Object.log (tests/rankingEffectiveness.test.js:371:17)
+
+  console.log
+      Score: 999
+
+      at Object.log (tests/rankingEffectiveness.test.js:372:17)
+
+  console.log
+      Compactness: 3 (4 consecutive pairs)
+
+      at Object.log (tests/rankingEffectiveness.test.js:373:17)
+
+  console.log
+      Gaps: 0 (should be 0)
+
+      at Object.log (tests/rankingEffectiveness.test.js:374:17)
+
+  console.log
+    
+    Scenario 13 (Overcapacity):
+
+      at Object.log (tests/rankingEffectiveness.test.js:394:17)
+
+  console.log
+      Score: 1018
+
+      at Object.log (tests/rankingEffectiveness.test.js:395:17)
+
+  console.log
+      Room Util (capped at 100%): 20.00
+
+      at Object.log (tests/rankingEffectiveness.test.js:396:17)
+
+  console.log
+    
+    Scenario 14 (All Faculty Zero Load):
+
+      at Object.log (tests/rankingEffectiveness.test.js:413:17)
+
+  console.log
+      Score: 1001
+
+      at Object.log (tests/rankingEffectiveness.test.js:414:17)
+
+  console.log
+      Workload Score: 0
+
+      at Object.log (tests/rankingEffectiveness.test.js:415:17)
+
+  console.log
+    
+    Scenario 15 (Alternating Gaps):
+
+      at Object.log (tests/rankingEffectiveness.test.js:452:17)
+
+  console.log
+      Alternating: 1005 (Gaps: -3.75)
+
+      at Object.log (tests/rankingEffectiveness.test.js:453:17)
+
+  console.log
+      Consecutive: 1011 (Compactness: 2.25)
+
+      at Object.log (tests/rankingEffectiveness.test.js:454:17)
+
+  console.log
+    
+    Scenario 16 (Weekend Scheduling):
+
+      at Object.log (tests/rankingEffectiveness.test.js:477:17)
+
+  console.log
+      Score: 1023
+
+      at Object.log (tests/rankingEffectiveness.test.js:478:17)
+
+  console.log
+      Compactness: 1.5
+
+      at Object.log (tests/rankingEffectiveness.test.js:479:17)
+
+  console.log
+      Workload Balance: 0
+
+      at Object.log (tests/rankingEffectiveness.test.js:480:17)
+
+  console.log
+    
+    Scenario 17 (Mixed Room Types):
+
+      at Object.log (tests/rankingEffectiveness.test.js:509:17)
+
+  console.log
+      Lab (100% util): 1018 (Room: 20.00)
+
+      at Object.log (tests/rankingEffectiveness.test.js:510:17)
+
+  console.log
+      Classroom (67% util): 1011 (Room: 13.33)
+
+      at Object.log (tests/rankingEffectiveness.test.js:511:17)
+
+  console.log
+    
+    Scenario 18 (All Days Teaching):
+
+      at Object.log (tests/rankingEffectiveness.test.js:538:17)
+
+  console.log
+      Score: 1003
+
+      at Object.log (tests/rankingEffectiveness.test.js:539:17)
+
+  console.log
+      Gaps: 0 (no gaps within days)
+
+      at Object.log (tests/rankingEffectiveness.test.js:540:17)
+
+  console.log
+      Compactness: 0 (no consecutive pairs)
+
+      at Object.log (tests/rankingEffectiveness.test.js:541:17)
+
+  console.log
+    
+    Scenario 19 (Utilization Extremes):
+
+      at Object.log (tests/rankingEffectiveness.test.js:568:17)
+
+  console.log
+      Max (100%): 1018 (Room: 20.00)
+
+      at Object.log (tests/rankingEffectiveness.test.js:569:17)
+
+  console.log
+      Min (2%):   998 (Room: 0.40)
+
+      at Object.log (tests/rankingEffectiveness.test.js:570:17)
+
+  console.log
+    
+    Scenario 20 (Maximum Fragmentation):
+
+      at Object.log (tests/rankingEffectiveness.test.js:604:17)
+
+  console.log
+      Fragmented (6-slot gap): 1008 (Gap: -7.5)
+
+      at Object.log (tests/rankingEffectiveness.test.js:605:17)
+
+  console.log
+      Compact (consecutive):   1016 (Compactness: 0.75)
+
+      at Object.log (tests/rankingEffectiveness.test.js:606:17)
+
+node.exe : FAIL tests/ranking
+Effectiveness.test.js
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (FAIL te  
+  sts/rankingEffectiveness   
+ .test.js:String) [], Rem    
+oteException
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+  Timetable Ranking 
+Effectiveness
+    ΓêÜ Scenario 1: Compact 
+Schedule vs Schedule with 
+Gaps (42 ms)
+    ΓêÜ Scenario 2: Balanced 
+Workload vs Unbalanced 
+Workload (3 ms)
+    ΓêÜ Scenario 3: Room 
+Utilization (Optimized vs 
+Wasteful) (3 ms)
+    ΓêÜ Scenario 4: Daily 
+Overload Penalty (4 ms)
+    ΓêÜ Scenario 5: 
+Multi-Day Distribution vs 
+Concentrated (5 ms)
+    ΓêÜ Scenario 6: Multiple 
+Gaps vs Single Gap (3 ms)
+    ΓêÜ Scenario 7: Extreme 
+Workload Imbalance (3 ms)
+    ΓêÜ Scenario 8: Room 
+Capacity Edge Cases (4 ms)
+    ΓêÜ Scenario 9: Combined 
+Optimization (Best vs Worst) 
+(11 ms)
+    ΓêÜ Scenario 10: Edge 
+Case - Empty Schedule (4 ms)
+    ΓêÜ Scenario 11: Edge 
+Case - Single Entry (4 ms)
+    ΓêÜ Scenario 12: Perfect 
+Compactness (All 
+Consecutive) (5 ms)
+    ΓêÜ Scenario 13: Room 
+Overcapacity (Students > 
+Capacity) (3 ms)
+    ΓêÜ Scenario 14: All 
+Faculty Zero Load (3 ms)
+    ΓêÜ Scenario 15: 
+Alternating Gaps Pattern (3 
+ms)
+    ΓêÜ Scenario 16: Weekend 
+Scheduling (4 ms)
+    ΓêÜ Scenario 17: Mixed 
+Room Types (Labs vs 
+Classrooms) (3 ms)
+    ΓêÜ Scenario 18: Faculty 
+Teaching Across All Days (4 
+ms)
+    ΓêÜ Scenario 19: Minimum 
+vs Maximum Room Utilization 
+(3 ms)
+    ├ù Scenario 20: 
+Fragmented Schedule (Maximum 
+Gaps) (5 ms)
+
+  ΓùÅ Timetable Ranking 
+Effectiveness ΓÇ║ Scenario 
+20: Fragmented Schedule 
+(Maximum Gaps)
+
+    expect(received).toBeLess
+Than(expected)
+
+    Expected: < -10
+    Received:   -7.5
+
+    [0m [90m 608 |[39m    
+     [90m// Compact should 
+score significantly 
+better[39m
+     [90m 609 |[39m        
+ expect(scoreCompact[33m.[3
+9mtotal)[33m.[39mtoBeGreate
+rThan(scoreFragmented[33m.[
+39mtotal)[33m;[39m
+    
+[31m[1m>[22m[39m[90m 
+610 |[39m         expect(sco
+reFragmented[33m.[39mdetail
+s[33m.[39mgapScore)[33m.[
+39mtoBeLessThan([33m-[39m[
+35m10[39m)[33m;[39m 
+[90m// Significant 
+penalty[39m
+     [90m     |[39m        
+                             
+             
+[31m[1m^[22m[39m
+     [90m 611 |[39m     
+})[33m;[39m
+     [90m 612 |[39m 
+})[33m;[39m
+     [90m 613 |[39m[0m
+
+      at Object.toBeLessThan 
+(tests/rankingEffectiveness.t
+est.js:610:50)
+
+Test Suites: 1 failed, 1 
+total
+Tests:       1 failed, 19 
+passed, 20 total
+Snapshots:   0 total
+Time:        1.085 s, 
+estimated 3 s
+Ran all test suites matching 
+rankingEffectiveness.test.js.

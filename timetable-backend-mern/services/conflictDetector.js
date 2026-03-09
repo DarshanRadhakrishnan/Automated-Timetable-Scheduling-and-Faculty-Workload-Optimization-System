@@ -1,74 +1,101 @@
 const Timetable = require('../models/Timetable');
 const Conflict = require('../models/Conflict');
 
+/**
+ * Detect conflicts entirely in-memory.
+ * Previous version did N+1 queries (3 findOne() calls per entry = 630+ queries for 210 entries).
+ * This version loads all entries once, then detects all conflicts with O(n) in-memory grouping.
+ */
 const detectConflicts = async (proposalId) => {
-    // If proposalId provided, we delete old conflicts for clean state (optional but good for consistency)
+    // Clean old conflicts for this proposal
     if (proposalId) {
         await Conflict.deleteMany({ proposalId });
     }
 
-    const conflicts = [];
     const query = proposalId ? { proposalId } : {};
-    const entries = await Timetable.find(query);
+    const entries = await Timetable.find(query)
+        .populate('facultyId', 'name')
+        .populate('roomId', 'name roomType')
+        .populate('sectionId', 'name')
+        .populate('timeslotId', 'day startTime endTime slot')
+        .lean();
 
+    const conflicts = [];
+
+    // ── Group entries by timeslot for O(n) conflict detection ──
+    const byTimeslot = new Map();
     for (const entry of entries) {
-        const baseQuery = {
-            timeslotId: entry.timeslotId,
-            // Optimization: Only look for conflicts with ID > current ID to avoid A-B / B-A duplicates
-            _id: { $gt: entry._id },
-        };
+        if (!entry.timeslotId) continue;
+        const tsId = entry.timeslotId._id.toString();
+        if (!byTimeslot.has(tsId)) byTimeslot.set(tsId, []);
+        byTimeslot.get(tsId).push(entry);
+    }
 
-        // IMPORTANT: Only check against entries in the same proposal
-        if (entry.proposalId) {
-            baseQuery.proposalId = entry.proposalId;
+    // For each timeslot group, find duplicate faculty/room/section
+    for (const [, group] of byTimeslot) {
+        if (group.length < 2) continue;
+
+        // Check faculty conflicts within this timeslot
+        const facultySeen = new Map();
+        for (const entry of group) {
+            if (!entry.facultyId) continue;
+            const fId = entry.facultyId._id.toString();
+            if (facultySeen.has(fId)) {
+                const timeStr = `${entry.timeslotId.day} ${entry.timeslotId.startTime}-${entry.timeslotId.endTime}`;
+                conflicts.push({
+                    type: 'faculty',
+                    entityId: entry.facultyId._id,
+                    entityName: entry.facultyId.name,
+                    timeslotId: entry.timeslotId._id,
+                    timeslotLabel: timeStr,
+                    reason: `Faculty ${entry.facultyId.name} is double booked at ${timeStr}`,
+                    proposalId: entry.proposalId || null
+                });
+            } else {
+                facultySeen.set(fId, entry);
+            }
         }
 
-        // Faculty conflict
-        const facultyConflict = await Timetable.findOne({
-            ...baseQuery,
-            facultyId: entry.facultyId,
-        });
-
-        if (facultyConflict) {
-            conflicts.push({
-                type: 'faculty',
-                entityId: entry.facultyId,
-                timeslotId: entry.timeslotId,
-                reason: `Faculty double booked in proposal ${entry.proposalId}`,
-                proposalId: entry.proposalId
-            });
+        // Check room conflicts within this timeslot
+        const roomSeen = new Map();
+        for (const entry of group) {
+            if (!entry.roomId) continue;
+            const rId = entry.roomId._id.toString();
+            if (roomSeen.has(rId)) {
+                const timeStr = `${entry.timeslotId.day} ${entry.timeslotId.startTime}-${entry.timeslotId.endTime}`;
+                conflicts.push({
+                    type: 'room',
+                    entityId: entry.roomId._id,
+                    entityName: `${entry.roomId.name} (${entry.roomId.roomType})`,
+                    timeslotId: entry.timeslotId._id,
+                    timeslotLabel: timeStr,
+                    reason: `Room ${entry.roomId.name} is double booked at ${timeStr}`,
+                    proposalId: entry.proposalId || null
+                });
+            } else {
+                roomSeen.set(rId, entry);
+            }
         }
 
-        // Room conflict
-        const roomConflict = await Timetable.findOne({
-            ...baseQuery,
-            roomId: entry.roomId,
-        });
-
-        if (roomConflict) {
-            conflicts.push({
-                type: 'room',
-                entityId: entry.roomId,
-                timeslotId: entry.timeslotId,
-                reason: `Room double booked in proposal ${entry.proposalId}`,
-                proposalId: entry.proposalId
-            });
-        }
-
-        // Section conflict
-        const sectionConflict = await Timetable.findOne({
-            ...baseQuery,
-            sectionId: entry.sectionId,
-        });
-
-        if (sectionConflict) {
-            conflicts.push({
-                type: 'section',
-                entityId: entry.sectionId,
-                timeslotId: entry.timeslotId,
-                reason: `Section ${entry.sectionId} has concurrent classes`,
-                proposalId: entry.proposalId
-            });
+        // Check section conflicts within this timeslot
+        const sectionSeen = new Map();
+        for (const entry of group) {
+            if (!entry.sectionId) continue;
+            const sId = entry.sectionId._id.toString();
+            if (sectionSeen.has(sId)) {
+                const timeStr = `${entry.timeslotId.day} ${entry.timeslotId.startTime}-${entry.timeslotId.endTime}`;
+                conflicts.push({
+                    type: 'section',
+                    entityId: entry.sectionId._id,
+                    entityName: entry.sectionId.name,
+                    timeslotId: entry.timeslotId._id,
+                    timeslotLabel: timeStr,
+                    reason: `Section ${entry.sectionId.name} has concurrent classes at ${timeStr}`,
+                    proposalId: entry.proposalId || null
+                });
+            } else {
+                sectionSeen.set(sId, entry);
+            }
         }
     }
 

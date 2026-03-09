@@ -31,7 +31,8 @@ Automated-Timetable-Scheduling-and-Faculty-Workload-Optimization-System/
 - ✅ Timetable generation algorithm
 - ✅ Conflict detection
 - ✅ **Automatic conflict resolution**
-- ✅ Database seeding script
+- ✅ **Advanced simulation and analysis features**
+- ✅ Database seeding script with realistic data
 
 ### Frontend ✅ COMPLETE
 - ✅ Interactive HTML interface
@@ -40,6 +41,11 @@ Automated-Timetable-Scheduling-and-Faculty-Workload-Optimization-System/
 - ✅ View generated timetable
 - ✅ Detect conflicts
 - ✅ **Resolve conflicts automatically**
+- ✅ **Faculty Impact Analysis with selection interface**
+- ✅ **Room Shortage Analysis with alternative suggestions**
+- ✅ **Simulation History tracking**
+- ✅ **Scenario Comparison tool**
+- ✅ **Bulk Faculty Analysis**
 - ✅ Clear timetable
 - ✅ Real-time statistics
 
@@ -230,6 +236,13 @@ curl -X DELETE http://localhost:5000/api/timetable
 - `POST /api/timetable/conflicts/detect` - Detect conflicts
 - `POST /api/timetable/conflicts/resolve` - **Automatically resolve conflicts**
 
+### Simulation & Analysis (NEW)
+- `POST /api/simulation/faculty-impact` - Analyze impact of faculty unavailability
+- `POST /api/simulation/room-shortage` - Analyze room shortage scenarios
+- `GET /api/simulation/history` - View simulation history
+- `POST /api/simulation/compare` - Compare two simulation scenarios
+- `POST /api/simulation/bulk-faculty` - Bulk faculty impact analysis
+
 ## 🎨 Features
 
 ### Timetable Generation Algorithm
@@ -268,6 +281,63 @@ The system now includes an **intelligent conflict resolution engine** that autom
 - Displays conflict-free timetable automatically
 
 **See [CONFLICT_RESOLUTION.md](CONFLICT_RESOLUTION.md) for detailed documentation.**
+
+### Advanced Simulation & Analysis Features ✨ NEW
+
+The system includes **5 powerful simulation and analysis tools** for proactive timetable management:
+
+#### 1. **Faculty Impact Analysis**
+Simulates the impact of faculty unavailability (illness, leave, resignation):
+- Calculates impact score based on classes and students affected
+- Provides severity classification (CRITICAL/HIGH/MEDIUM)
+- Generates smart recommendations (hire guest lecturers, redistribute workload)
+- Shows detailed list of affected classes
+- **Selection-based UI** - Click on faculty from list, no manual ID entry
+
+#### 2. **Room Shortage Analysis**
+Simulates room unavailability (maintenance, renovation, events):
+- Finds alternative rooms of the same type
+- Calculates impact on classes and students
+- Provides relocation recommendations
+- Shows available alternatives with capacity details
+- **Selection-based UI** - Click on room from list
+
+#### 3. **Simulation History**
+Tracks all simulation runs for analysis:
+- Stores last 50 simulations
+- Displays key metrics (type, score, classes, students)
+- Color-coded by severity for quick assessment
+- Relative timestamps ("Just now", "2 mins ago")
+- **One-click access** - No input required
+
+#### 4. **Scenario Comparison**
+Compares two simulations side-by-side:
+- Calculates score difference
+- Declares winner (higher impact = higher priority)
+- Helps prioritize which issue to address first
+- Shows detailed comparison metrics
+- **Radio button selection** - Choose from simulation history
+
+#### 5. **Bulk Faculty Analysis**
+Analyzes multiple faculty members simultaneously:
+- Ranks faculty by impact score
+- Identifies most critical faculty
+- Provides batch recommendations
+- Supports backup planning
+- **Checkbox selection** - Select multiple faculty at once
+
+**Impact Score Formula:**
+```
+Faculty Impact = (Classes × 10) + (Students ÷ 10)
+Room Impact = (Classes × 8) + (Students ÷ 15)
+
+Severity Levels:
+- CRITICAL: Score > 50 (Immediate action required)
+- HIGH: Score 26-50 (Planning needed)
+- MEDIUM: Score ≤ 25 (Manageable)
+```
+
+**See [PROJECT_WORK_DOCUMENTATION.md](PROJECT_WORK_DOCUMENTATION.md) for complete technical details.**
 
 ## 🐛 Troubleshooting
 

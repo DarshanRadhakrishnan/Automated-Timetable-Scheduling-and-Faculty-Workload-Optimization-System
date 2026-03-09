@@ -43,22 +43,38 @@ const seedDatabase = async () => {
         // ---------------------------------------------------------
         // 1. Process Faculty
         // ---------------------------------------------------------
-        // Using a Map to ensure uniqueness by name or ID
-        const facultyMap = new Map();
+        // Define faculty with email and department
+        const facultyData = [
+            { name: 'Dr. V Ananthanarayanan', email: 'v_ananthanarayanan@cb.amrita.edu', department: 'B Tech CSE' },
+            { name: 'Ms. P. Malathy', email: 'p_malathy@cb.amrita.edu', department: 'B.Tech CSE' },
+            { name: 'Dr. A. Baskar', email: 'a_baskar@cb.amrita.edu', department: 'B.Tech CSE' },
+            { name: 'Ms. Divya Singh', email: 's_divya2@cb.amrita.edu', department: 'B.Tech CSE' },
+            { name: 'Dr. Vishnuvarthan R', email: 'r_vishnuvarthan@cb.amrita.edu', department: 'B.Tech CSE' },
+            { name: 'Ms. E. Kuladevy', email: 'e_kuladevy@cb.amrita.edu', department: 'CIR' },
+            { name: 'Dr. Raghu Pradeep Nair', email: 'pn_raghu@cb.amrita.edu', department: 'CIR' },
+            { name: 'Ms. Anitha M', email: 'm_anitha@cb.amrita.edu', department: 'CIR' },
+            { name: 'Dr. Nikhil Raj P', email: 'pp_nikhilraj@cb.amrita.edu', department: 'B.Tech CHE' },
+            { name: 'Mr. Sumesh A K', email: 'ak_sumesh@cb.amrita.edu', department: 'B.Tech CSE' },
+            { name: 'Dr. Swapna T R', email: 'tr_swapna@cb.amrita.edu', department: 'B.Tech CSE' },
+            { name: 'Dr. Thangavel S', email: 's_thangavel@cb.amrita.edu', department: 'B.Tech CSE' },
+            { name: 'Dr. M. Anbazhagan', email: 'm_anbazhagan@cb.amrita.edu', department: 'B.Tech CSE' },
+            { name: 'Mr. V. Dayanand', email: 'v_dayanand@cb.amrita.edu', department: 'B.Tech CSE' },
+            { name: 'Dr. Ramraj T', email: 't_ramraj@cb.amrita.edu', department: 'B.Tech CSE' },
+            { name: 'Ms. Bindu K R', email: 'j_bindu@cb.amrita.edu', department: 'B.Tech CSE' },
+            { name: 'Ms. Nayana', email: 'i_nayana@cb.amrita.edu', department: 'Office of Head - Research' },
+            { name: 'Ms. D. Bharathi', email: 'd_bharathi@cb.amrita.edu', department: 'B.Tech CSE' },
+            { name: 'Dr. T. Senthil Kumar', email: 't_senthilkumar@cb.amrita.edu', department: 'B.Tech CSE' },
+            { name: 'Mr. Vedaj J. Padman', email: 'jp_vedaj@cb.amrita.edu', department: 'B.Tech CSE' },
+            { name: 'Ms. G. Radhika', email: 'g_radhika@cb.amrita.edu', department: 'B.Tech CSE' }
+        ];
 
-        data.faculty_data.forEach(f => {
-            if (!facultyMap.has(f.name)) {
-                // Determine maxLoad based on designation if possible, else 18
-                // data.json constraints say 18 for all
-                facultyMap.set(f.name, {
-                    name: f.name,
-                    maxLoad: 18
-                });
-            }
-        });
+        const facultyList = facultyData.map(f => ({
+            name: f.name,
+            email: f.email,
+            department: f.department,
+            maxLoad: 18
+        }));
 
-        // Convert Map to array and insert
-        const facultyList = Array.from(facultyMap.values());
         const createdFaculties = await Faculty.insertMany(facultyList);
         console.log(`Created ${createdFaculties.length} faculties`);
 

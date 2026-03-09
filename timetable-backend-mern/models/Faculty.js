@@ -5,6 +5,14 @@ const facultySchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    email: {
+        type: String,
+        required: false,
+    },
+    department: {
+        type: String,
+        required: false,
+    },
     maxLoad: {
         type: Number,
         required: true,

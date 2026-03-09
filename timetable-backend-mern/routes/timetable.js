@@ -9,9 +9,52 @@ const Timetable = require('../models/Timetable');
 const { generateTimetable } = require('../services/timetableGenerator');
 const { detectConflicts } = require('../services/conflictDetector');
 const { resolveConflicts } = require('../services/conflictResolver');
+const { verifyToken, authorize } = require('../middleware/auth');
+const auditLog = require('../middleware/audit');
+
+// Apply authentication to all timetable routes
+router.use(verifyToken);
+
+// Get system statistics for dashboard
+router.get('/stats', async (req, res) => {
+    try {
+        const [
+            totalFaculties,
+            totalCourses,
+            totalRooms,
+            totalSections,
+            totalTimeslots,
+            scheduledClasses
+        ] = await Promise.all([
+            Faculty.countDocuments(),
+            Course.countDocuments(),
+            Room.countDocuments(),
+            Section.countDocuments(),
+            TimeSlot.countDocuments(),
+            Timetable.countDocuments()
+        ]);
+
+        res.json({
+            success: true,
+            data: {
+                totalFaculties,
+                totalCourses,
+                totalRooms,
+                totalSections,
+                totalTimeslots,
+                scheduledClasses
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error fetching statistics',
+            error: error.message
+        });
+    }
+});
 
 // Generate timetable
-router.post('/generate', async (req, res) => {
+router.post('/generate', authorize(['admin']), auditLog('Generate Timetable', 'Timetable'), async (req, res) => {
     try {
         // Get all data
         const sections = await Section.find();
@@ -61,7 +104,7 @@ router.get('/versions', async (req, res) => {
                 }
             },
             { $sort: { score: -1 } }
-        ]);
+        ]).allowDiskUse(true);
 
         res.json({
             message: 'Versions retrieved successfully',
@@ -103,11 +146,12 @@ router.get('/', async (req, res) => {
         }
 
         const timetable = await Timetable.find(query)
-            .populate('sectionId')
-            .populate('courseId')
-            .populate('facultyId')
-            .populate('roomId')
-            .populate('timeslotId');
+            .populate('sectionId', 'name program batch')
+            .populate('courseId', 'name code courseType')
+            .populate('facultyId', 'name department')
+            .populate('roomId', 'name capacity roomType')
+            .populate('timeslotId', 'day startTime endTime slot')
+            .lean();
 
         res.json({
             message: 'Timetable retrieved successfully',
@@ -126,11 +170,12 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const entry = await Timetable.findById(req.params.id)
-            .populate('sectionId')
-            .populate('courseId')
-            .populate('facultyId')
-            .populate('roomId')
-            .populate('timeslotId');
+            .populate('sectionId', 'name program batch')
+            .populate('courseId', 'name code courseType')
+            .populate('facultyId', 'name department')
+            .populate('roomId', 'name capacity roomType')
+            .populate('timeslotId', 'day startTime endTime slot')
+            .lean();
 
         if (!entry) {
             return res.status(404).json({ message: 'Timetable entry not found' });
@@ -149,7 +194,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Delete all timetable entries
-router.delete('/', async (req, res) => {
+router.delete('/', authorize(['admin']), auditLog('Clear Timetable', 'Timetable'), async (req, res) => {
     try {
         await Timetable.deleteMany({});
         res.json({ message: 'All timetable entries deleted successfully' });
@@ -182,7 +227,7 @@ router.post('/conflicts/detect', async (req, res) => {
 
 // Resolve conflicts automatically
 // Supports ?proposalId=...
-router.post('/conflicts/resolve', async (req, res) => {
+router.post('/conflicts/resolve', authorize(['admin']), auditLog('Resolve Conflicts', 'Timetable'), async (req, res) => {
     try {
         const proposalId = req.query.proposalId || req.body.proposalId;
 
@@ -194,10 +239,47 @@ router.post('/conflicts/resolve', async (req, res) => {
 
         const result = await resolveConflicts(proposalId);
 
+        // Format changes for frontend display
+        const formattedChanges = result.resolutionLog?.map((log, index) => {
+            const action = log.action;
+            let changeDescription = {
+                classId: action.entryId,
+                className: `${action.courseName} (${action.sectionName})`,
+                action: '',
+                oldValue: '',
+                newValue: '',
+                unchanged: ''
+            };
+
+            if (action.action === 'moved') {
+                changeDescription.action = 'Timeslot Changed';
+                changeDescription.oldValue = `${action.originalTimeslot.day} Slot ${action.originalTimeslot.slot}`;
+                changeDescription.newValue = `${action.newTimeslot.day} Slot ${action.newTimeslot.slot}`;
+                changeDescription.unchanged = `${action.roomName} (Unchanged)`;
+            } else if (action.action === 'room_changed') {
+                changeDescription.action = 'Room Changed';
+                changeDescription.oldValue = action.originalRoom;
+                changeDescription.newValue = action.newRoom;
+                changeDescription.unchanged = `${action.timeslot.day} Slot ${action.timeslot.slot} (Unchanged)`;
+            } else if (action.action === 'moved_and_room_changed') {
+                changeDescription.action = 'Timeslot and Room Changed';
+                changeDescription.oldValue = `${action.originalTimeslot.day} Slot ${action.originalTimeslot.slot}, ${action.originalRoom}`;
+                changeDescription.newValue = `${action.newTimeslot.day} Slot ${action.newTimeslot.slot}, ${action.newRoom}`;
+            }
+
+            return changeDescription;
+        }) || [];
+
         res.json({
             message: result.message,
             success: result.success,
-            data: result
+            data: {
+                initial: result.initialConflicts,
+                resolved: result.conflictsResolved,
+                remaining: result.remainingConflicts,
+                changes: formattedChanges,
+                resolutionLog: result.resolutionLog
+            }
         });
     } catch (error) {
         res.status(500).json({
@@ -206,5 +288,7 @@ router.post('/conflicts/resolve', async (req, res) => {
         });
     }
 });
+
+
 
 module.exports = router;

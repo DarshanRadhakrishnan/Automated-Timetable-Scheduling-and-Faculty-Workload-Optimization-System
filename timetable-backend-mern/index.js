@@ -1,17 +1,24 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const compression = require('compression');
 const connectDB = require('./config/database');
 
 const app = express();
 
 // Middleware
-app.use(cors());
-app.use(express.json());
+app.use(cors({
+    origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+}));
+app.use(compression());  // gzip responses – reduces payload ~70-80%
+app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // Connect to MongoDB
-connectDB();
+// Connect to MongoDB handled in startup or tests
 
 // Routes
 app.use('/api/faculty', require('./routes/faculty'));
@@ -23,6 +30,12 @@ app.use('/api/availability', require('./routes/availability'));
 app.use('/api/timetable', require('./routes/timetable'));
 app.use('/api/conflicts', require('./conflicts'));
 app.use('/api/rescheduling', require('./routes/rescheduling'));
+app.use('/api/simulation', require('./routes/simulation'));
+app.use('/api/analysis', require('./routes/analysis'));
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/auditlog', require('./routes/auditlog'));
+app.use('/api/student', require('./routes/student'));
+app.use('/api/admin', require('./routes/admin'));
 
 // Health check
 app.get('/', (req, res) => {
@@ -36,13 +49,22 @@ app.get('/', (req, res) => {
             section: '/api/section',
             timeslot: '/api/timeslot',
             availability: '/api/availability',
-            timetable: '/api/timetable'
+            timetable: '/api/timetable',
+            auth: '/api/auth',
+            student: '/api/student',
+            admin: '/api/admin',
+            auditlog: '/api/auditlog'
         }
     });
 });
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+if (require.main === module) {
+    connectDB();
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+}
+
+module.exports = app;
