@@ -8,11 +8,16 @@ const app = express();
 
 // Middleware
 app.use(cors({
-    origin: true, // Allow all origins (e.g., dynamic Vercel URLs for frontend)
+    origin: function (origin, callback) {
+        // Allows any origin
+        callback(null, true);
+    },
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization'],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 }));
+
+app.options('*', cors());
 app.use(compression());  // gzip responses – reduces payload ~70-80%
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true }));
