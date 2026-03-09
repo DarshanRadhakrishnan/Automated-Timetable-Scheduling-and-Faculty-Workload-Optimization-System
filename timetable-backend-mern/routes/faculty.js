@@ -29,7 +29,8 @@ router.get('/me/slots', verifyToken, authorize(['faculty', 'admin']), async (req
             .populate('courseId', 'name code')
             .populate('roomId', 'name capacity')
             .populate('timeslotId', 'day startTime endTime slot')
-            .sort({ 'timeslotId.day': 1, 'timeslotId.slot': 1 });
+            .sort({ 'timeslotId.day': 1, 'timeslotId.slot': 1 })
+            .lean();
 
         res.json({
             success: true,
@@ -68,7 +69,8 @@ router.get('/me/workload', verifyToken, authorize(['faculty', 'admin']), async (
         const slots = await Timetable.find({ facultyId: user.facultyId })
             .populate('courseId', 'name code')
             .populate('sectionId', 'name')
-            .populate('timeslotId', 'day startTime endTime slot');
+            .populate('timeslotId', 'day startTime endTime slot')
+            .lean();
 
         // Calculate workload per day
         const perDay = {};
@@ -141,7 +143,8 @@ router.get('/me/slots/day/:day', verifyToken, authorize(['faculty', 'admin']), a
             .populate('sectionId', 'name')
             .populate('courseId', 'name code')
             .populate('roomId', 'name')
-            .populate('timeslotId', 'day startTime endTime slot');
+            .populate('timeslotId', 'day startTime endTime slot')
+            .lean();
 
         const day = req.params.day.toLowerCase();
         const filtered = allSlots.filter(s => s.timeslotId?.day?.toLowerCase() === day);

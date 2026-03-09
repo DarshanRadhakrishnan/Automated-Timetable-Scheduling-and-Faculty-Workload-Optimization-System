@@ -104,7 +104,7 @@ router.get('/versions', async (req, res) => {
                 }
             },
             { $sort: { score: -1 } }
-        ]);
+        ]).allowDiskUse(true);
 
         res.json({
             message: 'Versions retrieved successfully',
@@ -146,11 +146,12 @@ router.get('/', async (req, res) => {
         }
 
         const timetable = await Timetable.find(query)
-            .populate('sectionId')
-            .populate('courseId')
-            .populate('facultyId')
-            .populate('roomId')
-            .populate('timeslotId');
+            .populate('sectionId', 'name program batch')
+            .populate('courseId', 'name code courseType')
+            .populate('facultyId', 'name department')
+            .populate('roomId', 'name capacity roomType')
+            .populate('timeslotId', 'day startTime endTime slot')
+            .lean();
 
         res.json({
             message: 'Timetable retrieved successfully',
@@ -169,11 +170,12 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const entry = await Timetable.findById(req.params.id)
-            .populate('sectionId')
-            .populate('courseId')
-            .populate('facultyId')
-            .populate('roomId')
-            .populate('timeslotId');
+            .populate('sectionId', 'name program batch')
+            .populate('courseId', 'name code courseType')
+            .populate('facultyId', 'name department')
+            .populate('roomId', 'name capacity roomType')
+            .populate('timeslotId', 'day startTime endTime slot')
+            .lean();
 
         if (!entry) {
             return res.status(404).json({ message: 'Timetable entry not found' });

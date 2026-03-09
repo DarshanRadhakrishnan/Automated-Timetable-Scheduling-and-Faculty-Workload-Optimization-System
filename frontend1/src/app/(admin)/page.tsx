@@ -1,11 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { getFaculties } from '@/services/facultyService';
-import { getCourses } from '@/services/courseService';
-import { getRooms } from '@/services/roomService';
-import { getSections } from '@/services/sectionService';
-import { getTimetables } from '@/services/timetableService';
+import { useAuth } from '@/context/AuthContext';
+import { getStats } from '@/services/timetableService';
 import {
   UserCircleIcon,
   BoxCubeIcon,
@@ -16,6 +13,7 @@ import {
 } from '@/icons';
 
 export default function Ecommerce() {
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const [stats, setStats] = useState({
     faculties: 0,
     courses: 0,
@@ -25,22 +23,19 @@ export default function Ecommerce() {
   });
 
   useEffect(() => {
+    // Only fetch when auth is resolved and user is authenticated
+    if (authLoading || !isAuthenticated) return;
+
     const fetchStats = async () => {
       try {
-        const [faculties, courses, rooms, sections, timetable] = await Promise.all([
-          getFaculties(),
-          getCourses(),
-          getRooms(),
-          getSections(),
-          getTimetables(),
-        ]);
-
+        // Use the lightweight /stats endpoint instead of fetching all records
+        const data = await getStats();
         setStats({
-          faculties: faculties.length,
-          courses: courses.length,
-          rooms: rooms.length,
-          sections: sections.length,
-          scheduledClasses: timetable.length,
+          faculties: data.totalFaculties || 0,
+          courses: data.totalCourses || 0,
+          rooms: data.totalRooms || 0,
+          sections: data.totalSections || 0,
+          scheduledClasses: data.scheduledClasses || 0,
         });
       } catch (error) {
         console.error('Failed to fetch stats:', error);
@@ -48,7 +43,7 @@ export default function Ecommerce() {
     };
 
     fetchStats();
-  }, []);
+  }, [authLoading, isAuthenticated]);
 
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">

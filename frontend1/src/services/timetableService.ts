@@ -3,7 +3,7 @@ import api, { apiLongRunning } from './api';
 export const getTimetables = async (proposalId?: number) => {
     // Fetch timetable for specific proposal or all if not specified
     const url = proposalId ? `/timetable?proposalId=${proposalId}` : '/timetable';
-    const response = await api.get(url);
+    const response = await apiLongRunning.get(url);
     return response.data.data || [];
 };
 

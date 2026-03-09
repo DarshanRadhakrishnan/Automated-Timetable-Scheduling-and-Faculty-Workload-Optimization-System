@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 // Paths that DO NOT require authentication
 const PUBLIC_PATHS = ['/login', '/signup', '/(auth)'];
 
-export function middleware(request: NextRequest) {
+export default function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
     // Allow public paths
