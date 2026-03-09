@@ -9,6 +9,11 @@ on:
 jobs:
   backend-ci:
     runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:latest
+        ports:
+          - 27017:27017
     defaults:
       run:
         working-directory: ./timetable-backend-mern
@@ -29,7 +34,7 @@ jobs:
         run: npm test
         env:
           JWT_SECRET: superSecretKey
-          # In a real scenario, use a test DB. The tests here should ideally be mocked or use memory DB.
+          MONGO_URI_TEST: mongodb://127.0.0.1:27017/timetable_test
 
   frontend-ci:
     runs-on: ubuntu-latest
