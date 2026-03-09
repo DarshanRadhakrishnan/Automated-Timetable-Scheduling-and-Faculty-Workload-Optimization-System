@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: timetable-backend
+    runtime: node
+    rootDir: timetable-backend-mern
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: MONGODB_URI
+        sync: false        # Set this manually in Render dashboard (your Atlas URI)
+      - key: JWT_SECRET
+        sync: false        # Set this manually in Render dashboard
+      - key: ALLOWED_ORIGINS
+        sync: false        # Set this to your Vercel URL, e.g. https://your-app.vercel.app
