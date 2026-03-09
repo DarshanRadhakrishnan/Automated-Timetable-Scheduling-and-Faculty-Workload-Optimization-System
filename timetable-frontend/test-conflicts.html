@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conflict Checker - Quick Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .success {
+            background: #28a745;
+        }
+
+        .success:hover {
+            background: #218838;
+        }
+
+        .danger {
+            background: #dc3545;
+        }
+
+        .danger:hover {
+            background: #c82333;
+        }
+
+        #output {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background: #007bff;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            padding: 5px 10px;
+            border-radius: 3px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .faculty {
+            background: #dc3545;
+        }
+
+        .room {
+            background: #fd7e14;
+        }
+
+        .section {
+            background: #e83e8c;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h1>🔍 Conflict Detection Test</h1>
+        <p>Quick test page to verify conflict detection is working</p>
+
+        <div>
+            <button class="success" onclick="detectConflicts()">🔍 Detect Conflicts</button>
+            <button onclick="viewConflicts()">⚠️ View Conflicts</button>
+            <button onclick="viewTimetable()">📅 View Timetable</button>
+            <button class="danger" onclick="clearOutput()">🗑️ Clear Output</button>
+        </div>
+
+        <div id="output"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+
+        async function detectConflicts() {
+            const output = document.getElementById('output');
+            output.innerHTML = 'Detecting conflicts...';
+
+            try {
+                const response = await fetch(`${API_URL}/conflicts/detect`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+
+                output.innerHTML = `<h3>✅ Detection Complete!</h3>
+                    <p><strong>Conflicts Found:</strong> ${data.conflictsFound}</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                output.innerHTML = `<h3>❌ Error</h3><p>${error.message}</p>`;
+            }
+        }
+
+        async function viewConflicts() {
+            const output = document.getElementById('output');
+            output.innerHTML = 'Loading conflicts...';
+
+            try {
+                const response = await fetch(`${API_URL}/conflicts`);
+                const data = await response.json();
+
+                if (data.success && data.data && data.data.length > 0) {
+                    let html = `<h3>⚠️ Found ${data.count} Conflicts</h3>`;
+                    html += '<table><thead><tr><th>Type</th><th>Reason</th><th>Entity ID</th><th>Timeslot</th></tr></thead><tbody>';
+
+                    data.data.forEach(conflict => {
+                        html += `<tr>
+                            <td><span class="badge ${conflict.type}">${conflict.type.toUpperCase()}</span></td>
+                            <td>${conflict.reason}</td>
+                            <td style="font-family: monospace; font-size: 12px;">${conflict.entityId}</td>
+                            <td>${conflict.timeslotId}</td>
+                        </tr>`;
+                    });
+
+                    html += '</tbody></table>';
+                    output.innerHTML = html;
+                } else {
+                    output.innerHTML = '<h3>✅ No Conflicts Found!</h3>';
+                }
+            } catch (error) {
+                output.innerHTML = `<h3>❌ Error</h3><p>${error.message}</p>`;
+            }
+        }
+
+        async function viewTimetable() {
+            const output = document.getElementById('output');
+            output.innerHTML = 'Loading timetable...';
+
+            try {
+                const response = await fetch(`${API_URL}/timetable`);
+                const data = await response.json();
+
+                output.innerHTML = `<h3>📅 Timetable Entries: ${data.count}</h3>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                output.innerHTML = `<h3>❌ Error</h3><p>${error.message}</p>`;
+            }
+        }
+
+        function clearOutput() {
+            document.getElementById('output').innerHTML = '';
+        }
+
+        // Auto-check on load
+        window.onload = async () => {
+            const output = document.getElementById('output');
+            try {
+                const response = await fetch('http://localhost:5000');
+                output.innerHTML = '<h3>✅ Server Connected!</h3><p>Click a button above to test conflict detection.</p>';
+            } catch (error) {
+                output.innerHTML = '<h3>❌ Server Not Running</h3><p>Please start the backend server first.</p>';
+            }
+        };
+    </script>
+</body>
+
+</html>
