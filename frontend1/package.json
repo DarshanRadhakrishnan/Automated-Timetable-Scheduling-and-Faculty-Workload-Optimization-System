@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint ."
   },
@@ -21,7 +21,9 @@
     "@tailwindcss/postcss": "^4.1.17",
     "apexcharts": "^4.7.0",
     "autoprefixer": "^10.4.22",
+    "axios": "^1.13.6",
     "flatpickr": "^4.6.13",
+    "lucide-react": "^0.577.0",
     "next": "16.0.10",
     "react": "^19.2.0",
     "react-apexcharts": "^1.8.0",

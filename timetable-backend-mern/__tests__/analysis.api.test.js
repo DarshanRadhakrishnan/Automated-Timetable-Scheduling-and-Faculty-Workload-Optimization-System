@@ -1,5 +1,15 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
+
+// Mock Auth Middleware
+jest.mock('../middleware/auth', () => ({
+    verifyToken: (req, res, next) => {
+        req.user = { id: 'testAdminId', role: 'admin' };
+        next();
+    },
+    authorize: () => (req, res, next) => next()
+}));
+
 const app = require('../index'); // Ensure index.js exports app
 
 // Import models for setup

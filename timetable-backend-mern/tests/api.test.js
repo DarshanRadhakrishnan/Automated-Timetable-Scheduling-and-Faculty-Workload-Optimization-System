@@ -3,6 +3,15 @@ const request = require('supertest');
 // Mock Database Connection
 jest.mock('../config/database', () => jest.fn());
 
+// Mock Auth Middleware
+jest.mock('../middleware/auth', () => ({
+    verifyToken: (req, res, next) => {
+        req.user = { id: 'testAdminId', role: 'admin' };
+        next();
+    },
+    authorize: () => (req, res, next) => next()
+}));
+
 const app = require('../index');
 const Section = require('../models/Section');
 const Course = require('../models/Course');
@@ -253,7 +262,8 @@ describe('API Endpoints - Comprehensive Test Suite', () => {
                     { _id: 'p1', score: 95, entryCount: 10, updatedAt: new Date() },
                     { _id: 'p2', score: 90, entryCount: 10, updatedAt: new Date() }
                 ];
-                Timetable.aggregate.mockResolvedValue(mockVersions);
+                const mockAggregate = { allowDiskUse: jest.fn().mockResolvedValue(mockVersions) };
+                Timetable.aggregate.mockReturnValue(mockAggregate);
 
                 const res = await request(app).get('/api/timetable/versions');
 
@@ -262,7 +272,8 @@ describe('API Endpoints - Comprehensive Test Suite', () => {
             });
 
             it('should handle errors when fetching versions', async () => {
-                Timetable.aggregate.mockRejectedValue(new Error('Database error'));
+                const mockAggregate = { allowDiskUse: jest.fn().mockRejectedValue(new Error('Database error')) };
+                Timetable.aggregate.mockReturnValue(mockAggregate);
 
                 const res = await request(app).get('/api/timetable/versions');
 
