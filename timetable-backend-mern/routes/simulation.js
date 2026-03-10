@@ -341,4 +341,41 @@ router.post('/bulk-faculty', async (req, res) => {
     }
 });
 
+// 6. Faculty List (helper for frontend dropdowns)
+router.get('/faculty-list', async (req, res) => {
+    try {
+        const faculty = await Faculty.find({}, 'name department _id').sort({ name: 1 });
+        res.json({
+            success: true,
+            data: faculty.map(f => ({
+                _id: f._id,
+                name: f.name,
+                department: f.department
+            }))
+        });
+    } catch (error) {
+        console.error('Faculty list error:', error);
+        res.status(500).json({ message: 'Error fetching faculty list', error: error.message });
+    }
+});
+
+// 7. Room List (helper for frontend dropdowns)
+router.get('/room-list', async (req, res) => {
+    try {
+        const rooms = await Room.find({}, 'name roomType capacity _id').sort({ name: 1 });
+        res.json({
+            success: true,
+            data: rooms.map(r => ({
+                _id: r._id,
+                name: r.name,
+                roomType: r.roomType,
+                capacity: r.capacity
+            }))
+        });
+    } catch (error) {
+        console.error('Room list error:', error);
+        res.status(500).json({ message: 'Error fetching room list', error: error.message });
+    }
+});
+
 module.exports = router;

@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 
 const WorkloadChart = dynamic(() => import('@/components/analytics/WorkloadChart'), { ssr: false });
 const ConflictHeatmap = dynamic(() => import('@/components/analytics/ConflictHeatmap'), { ssr: false });
+const ImpactAnalysis = dynamic(() => import('@/components/analytics/ImpactAnalysis'), { ssr: false });
 
 export default function AnalyticsPage() {
     const { user, loading } = useAuth();
@@ -43,10 +44,15 @@ export default function AnalyticsPage() {
     return (
         <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
             <h2 className="mb-4 text-2xl font-bold dark:text-white">Analytics Dashboard</h2>
-            <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+
+            {/* Existing Charts */}
+            <div className="grid grid-cols-1 gap-4 xl:grid-cols-2 mb-6">
                 <WorkloadChart data={workloadData} />
                 <ConflictHeatmap data={heatmapData} />
             </div>
+
+            {/* Scenario Impact Analysis — full width below existing charts */}
+            <ImpactAnalysis />
         </div>
     );
 }

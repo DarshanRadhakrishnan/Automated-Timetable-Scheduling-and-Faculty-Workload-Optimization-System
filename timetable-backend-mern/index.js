@@ -1,30 +1,17 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const compression = require('compression');
 const connectDB = require('./config/database');
 
 const app = express();
 
 // Middleware
-app.use(cors({
-    origin: function (origin, callback) {
-        // Allows any origin
-        callback(null, true);
-    },
-    credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-}));
-
-// Options preflight wildcard fix for Express 5 / newer path-to-regexp
-app.options('*catchall', cors());
-app.use(compression());  // gzip responses – reduces payload ~70-80%
-app.use(express.json({ limit: '5mb' }));
+app.use(cors());
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Connect to MongoDB
-// Connect to MongoDB handled in startup or tests
+connectDB();
 
 // Routes
 app.use('/api/faculty', require('./routes/faculty'));
@@ -38,10 +25,6 @@ app.use('/api/conflicts', require('./conflicts'));
 app.use('/api/rescheduling', require('./routes/rescheduling'));
 app.use('/api/simulation', require('./routes/simulation'));
 app.use('/api/analysis', require('./routes/analysis'));
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/auditlog', require('./routes/auditlog'));
-app.use('/api/student', require('./routes/student'));
-app.use('/api/admin', require('./routes/admin'));
 
 // Health check
 app.get('/', (req, res) => {
@@ -55,22 +38,13 @@ app.get('/', (req, res) => {
             section: '/api/section',
             timeslot: '/api/timeslot',
             availability: '/api/availability',
-            timetable: '/api/timetable',
-            auth: '/api/auth',
-            student: '/api/student',
-            admin: '/api/admin',
-            auditlog: '/api/auditlog'
+            timetable: '/api/timetable'
         }
     });
 });
 
 const PORT = process.env.PORT || 5000;
 
-if (require.main === module) {
-    connectDB();
-    app.listen(PORT, () => {
-        console.log(`Server is running on port ${PORT}`);
-    });
-}
-
-module.exports = app;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});

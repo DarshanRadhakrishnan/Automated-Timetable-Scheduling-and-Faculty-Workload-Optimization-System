@@ -7,18 +7,17 @@ const FacultyAvailability = require('../models/FacultyAvailability');
 const { detectConflicts } = require('./conflictDetector');
 
 /**
- * Automatically resolve conflicts in a timetable.
- *
- * OPTIMISED VERSION
- * -  Pre-loads all reference data (timeslots, rooms, availability) once.
- * -  Builds an in-memory occupancy index so availability checks are O(1)
- *    instead of hitting the DB each time.
- * -  Falls back to the same strategies: re-slot, re-room, or both.
+ * Automatically resolve conflicts in a timetable
+ * Strategy:
+ * 1. Detect all conflicts
+ * 2. For each conflict, try to find an alternative slot/room/faculty
+ * 3. Apply the changes
+ * 4. Re-detect conflicts to verify resolution
  */
 const resolveConflicts = async (proposalId) => {
     console.log(`Starting conflict resolution for proposal ${proposalId}...`);
 
-    // Step 1 – detect current conflicts
+    // Step 1: Detect conflicts
     let conflicts = await detectConflicts(proposalId);
 
     if (conflicts.length === 0) {
@@ -32,306 +31,52 @@ const resolveConflicts = async (proposalId) => {
 
     console.log(`Found ${conflicts.length} conflicts to resolve`);
 
-    // ── Pre-load reference data (one DB round-trip each) ─────
-    const [allSlots, allRooms, unavailabilities, allEntries] = await Promise.all([
-        TimeSlot.find().lean(),
-        Room.find().lean(),
-        FacultyAvailability.find({ isAvailable: false }).lean(),
-        Timetable.find({ proposalId })
-            .populate('sectionId', 'name studentCount')
-            .populate('courseId', 'name code courseType')
-            .populate('roomId', 'name capacity roomType')
-            .populate('facultyId', 'name')
-            .populate('timeslotId', 'day slot startTime endTime')
-            .lean()
-    ]);
-
-    // ── Build in-memory occupancy index ──────────────────────
-    // key = "field:resourceId:timeslotId" → true
-    const occupancy = new Set();
-    function occKey(field, resId, tsId) {
-        return `${field}:${resId}:${tsId}`;
-    }
-    for (const e of allEntries) {
-        if (e.facultyId) occupancy.add(occKey('faculty', e.facultyId._id || e.facultyId, e.timeslotId._id || e.timeslotId));
-        if (e.roomId) occupancy.add(occKey('room', e.roomId._id || e.roomId, e.timeslotId._id || e.timeslotId));
-        if (e.sectionId) occupancy.add(occKey('section', e.sectionId._id || e.sectionId, e.timeslotId._id || e.timeslotId));
-    }
-
-    // Faculty unavailability set
-    const facultyUnavailable = new Set();
-    for (const u of unavailabilities) {
-        facultyUnavailable.add(`${u.facultyId}:${u.timeslotId}`);
-    }
-
-    // ── Helper: check faculty availability (in-memory) ──────
-    function isFacultyFree(fId, tsId) {
-        if (facultyUnavailable.has(`${fId}:${tsId}`)) return false;
-        return !occupancy.has(occKey('faculty', fId, tsId));
-    }
-    function isResourceFree(field, rId, tsId) {
-        return !occupancy.has(occKey(field, rId, tsId));
-    }
-
-    // ── Helper: update occupancy after a move ───────────────
-    function moveOccupancy(entry, newTsId, newRoomId) {
-        const oldTs = entry.timeslotId._id || entry.timeslotId;
-        const fId = entry.facultyId._id || entry.facultyId;
-        const sId = entry.sectionId._id || entry.sectionId;
-        const oldRId = entry.roomId._id || entry.roomId;
-        const rId = newRoomId || oldRId;
-
-        // Remove old occupancies
-        occupancy.delete(occKey('faculty', fId, oldTs));
-        occupancy.delete(occKey('room', oldRId, oldTs));
-        occupancy.delete(occKey('section', sId, oldTs));
-
-        // Add new occupancies
-        occupancy.add(occKey('faculty', fId, newTsId));
-        occupancy.add(occKey('room', rId, newTsId));
-        occupancy.add(occKey('section', sId, newTsId));
-    }
-
-    // ── Resolve ─────────────────────────────────────────────
     const resolutionLog = [];
     let resolvedCount = 0;
 
-    // Group conflicts by type
+    // Group conflicts by type for better resolution strategy
     const conflictsByType = {
         faculty: conflicts.filter(c => c.type === 'faculty'),
         room: conflicts.filter(c => c.type === 'room'),
         section: conflicts.filter(c => c.type === 'section')
     };
 
-    // Helper to find the pair of conflicting entries
-    function findConflictingEntries(field, entityId, timeslotId) {
-        return allEntries.filter(e => {
-            const eField = e[field]?._id?.toString() || e[field]?.toString();
-            const eTs = e.timeslotId?._id?.toString() || e.timeslotId?.toString();
-            return eField === entityId.toString() && eTs === timeslotId.toString();
-        });
-    }
-
-    // ── Faculty conflicts ────────────────────────────────────
+    // Step 2: Resolve faculty conflicts
     for (const conflict of conflictsByType.faculty) {
-        const entries = findConflictingEntries('facultyId', conflict.entityId, conflict.timeslotId);
-        if (entries.length < 2) continue;
-
-        const entryToMove = entries[1];
-        const originalTimeslot = entryToMove.timeslotId;
-        let resolved = false;
-
-        for (const slot of allSlots) {
-            if (slot._id.toString() === conflict.timeslotId.toString()) continue;
-
-            const fId = entryToMove.facultyId._id || entryToMove.facultyId;
-            const sId = entryToMove.sectionId._id || entryToMove.sectionId;
-            const rId = entryToMove.roomId._id || entryToMove.roomId;
-
-            if (!isFacultyFree(fId, slot._id)) continue;
-            if (!isResourceFree('section', sId, slot._id)) continue;
-            if (!isResourceFree('room', rId, slot._id)) continue;
-
-            // Apply change
-            await Timetable.findByIdAndUpdate(entryToMove._id, { timeslotId: slot._id });
-            moveOccupancy(entryToMove, slot._id, null);
-
+        const resolved = await resolveFacultyConflict(conflict, proposalId);
+        if (resolved) {
             resolvedCount++;
             resolutionLog.push({
                 type: 'faculty',
-                conflict,
-                action: {
-                    action: 'moved',
-                    entryId: entryToMove._id,
-                    courseName: entryToMove.courseId?.name || 'Unknown Course',
-                    courseType: entryToMove.courseId?.courseType || 'N/A',
-                    sectionName: entryToMove.sectionId?.name || 'Unknown Section',
-                    facultyName: entryToMove.facultyId?.name || 'Unknown Faculty',
-                    roomName: entryToMove.roomId?.name || 'Unknown Room',
-                    originalTimeslot: { day: originalTimeslot?.day || 'N/A', slot: originalTimeslot?.slot || 'N/A' },
-                    newTimeslot: { day: slot.day, slot: slot.slot },
-                    from: conflict.timeslotId,
-                    to: slot._id,
-                    reason: 'Faculty conflict resolved by rescheduling'
-                }
+                conflict: conflict,
+                action: resolved
             });
-            resolved = true;
-            break;
         }
     }
 
-    // ── Room conflicts ───────────────────────────────────────
+    // Step 3: Resolve room conflicts
     for (const conflict of conflictsByType.room) {
-        const entries = findConflictingEntries('roomId', conflict.entityId, conflict.timeslotId);
-        if (entries.length < 2) continue;
-
-        const entryToMove = entries[1];
-        const originalRoom = entryToMove.roomId;
-        const originalTimeslot = entryToMove.timeslotId;
-        let resolved = false;
-
-        // Strategy 1: find alternative room at same timeslot
-        const altRooms = allRooms.filter(r =>
-            r.roomType === (originalRoom.roomType || originalRoom) &&
-            r._id.toString() !== (originalRoom._id || originalRoom).toString()
-        );
-
-        for (const room of altRooms) {
-            if (isResourceFree('room', room._id, conflict.timeslotId)) {
-                await Timetable.findByIdAndUpdate(entryToMove._id, { roomId: room._id });
-
-                // Update occupancy
-                const oldRId = originalRoom._id || originalRoom;
-                occupancy.delete(occKey('room', oldRId, conflict.timeslotId));
-                occupancy.add(occKey('room', room._id, conflict.timeslotId));
-
-                resolvedCount++;
-                resolutionLog.push({
-                    type: 'room',
-                    conflict,
-                    action: {
-                        action: 'room_changed',
-                        entryId: entryToMove._id,
-                        courseName: entryToMove.courseId?.name || 'Unknown Course',
-                        courseType: entryToMove.courseId?.courseType || 'N/A',
-                        sectionName: entryToMove.sectionId?.name || 'Unknown Section',
-                        facultyName: entryToMove.facultyId?.name || 'Unknown Faculty',
-                        timeslot: { day: originalTimeslot?.day || 'N/A', slot: originalTimeslot?.slot || 'N/A' },
-                        originalRoom: originalRoom.name || 'Unknown Room',
-                        newRoom: room.name || 'Unknown Room',
-                        from: originalRoom._id,
-                        to: room._id,
-                        reason: 'Room conflict resolved by changing room'
-                    }
-                });
-                resolved = true;
-                break;
-            }
-        }
-
-        if (resolved) continue;
-
-        // Strategy 2: reschedule to different timeslot
-        for (const slot of allSlots) {
-            if (slot._id.toString() === conflict.timeslotId.toString()) continue;
-
-            const fId = entryToMove.facultyId._id || entryToMove.facultyId;
-            const sId = entryToMove.sectionId._id || entryToMove.sectionId;
-            const rId = originalRoom._id || originalRoom;
-
-            if (!isFacultyFree(fId, slot._id)) continue;
-            if (!isResourceFree('section', sId, slot._id)) continue;
-            if (!isResourceFree('room', rId, slot._id)) continue;
-
-            await Timetable.findByIdAndUpdate(entryToMove._id, { timeslotId: slot._id });
-            moveOccupancy(entryToMove, slot._id, null);
-
+        const resolved = await resolveRoomConflict(conflict, proposalId);
+        if (resolved) {
             resolvedCount++;
             resolutionLog.push({
                 type: 'room',
-                conflict,
-                action: {
-                    action: 'moved',
-                    entryId: entryToMove._id,
-                    courseName: entryToMove.courseId?.name || 'Unknown Course',
-                    courseType: entryToMove.courseId?.courseType || 'N/A',
-                    sectionName: entryToMove.sectionId?.name || 'Unknown Section',
-                    facultyName: entryToMove.facultyId?.name || 'Unknown Faculty',
-                    roomName: originalRoom.name || 'Unknown Room',
-                    originalTimeslot: { day: originalTimeslot?.day || 'N/A', slot: originalTimeslot?.slot || 'N/A' },
-                    newTimeslot: { day: slot.day, slot: slot.slot },
-                    from: conflict.timeslotId,
-                    to: slot._id,
-                    reason: 'Room conflict resolved by rescheduling'
-                }
+                conflict: conflict,
+                action: resolved
             });
-            break;
         }
     }
 
-    // ── Section conflicts ────────────────────────────────────
+    // Step 4: Resolve section conflicts
     for (const conflict of conflictsByType.section) {
-        const entries = findConflictingEntries('sectionId', conflict.entityId, conflict.timeslotId);
-        if (entries.length < 2) continue;
-
-        const entryToMove = entries[1];
-        const originalTimeslot = entryToMove.timeslotId;
-
-        for (const slot of allSlots) {
-            if (slot._id.toString() === conflict.timeslotId.toString()) continue;
-
-            const fId = entryToMove.facultyId._id || entryToMove.facultyId;
-            const sId = entryToMove.sectionId._id || entryToMove.sectionId;
-            const rId = entryToMove.roomId._id || entryToMove.roomId;
-
-            if (!isFacultyFree(fId, slot._id)) continue;
-            if (!isResourceFree('section', sId, slot._id)) continue;
-
-            if (isResourceFree('room', rId, slot._id)) {
-                // Same room, different timeslot
-                await Timetable.findByIdAndUpdate(entryToMove._id, { timeslotId: slot._id });
-                moveOccupancy(entryToMove, slot._id, null);
-
-                resolvedCount++;
-                resolutionLog.push({
-                    type: 'section',
-                    conflict,
-                    action: {
-                        action: 'moved',
-                        entryId: entryToMove._id,
-                        courseName: entryToMove.courseId?.name || 'Unknown Course',
-                        courseType: entryToMove.courseId?.courseType || 'N/A',
-                        sectionName: entryToMove.sectionId?.name || 'Unknown Section',
-                        facultyName: entryToMove.facultyId?.name || 'Unknown Faculty',
-                        roomName: entryToMove.roomId?.name || 'Unknown Room',
-                        originalTimeslot: { day: originalTimeslot?.day || 'N/A', slot: originalTimeslot?.slot || 'N/A' },
-                        newTimeslot: { day: slot.day, slot: slot.slot },
-                        from: conflict.timeslotId,
-                        to: slot._id,
-                        reason: 'Section conflict resolved by rescheduling'
-                    }
-                });
-                break;
-            } else {
-                // Try alternative room at this new timeslot
-                const altRooms = allRooms.filter(r =>
-                    r.roomType === (entryToMove.roomId?.roomType || '')
-                );
-                for (const room of altRooms) {
-                    if (isResourceFree('room', room._id, slot._id)) {
-                        await Timetable.findByIdAndUpdate(entryToMove._id, {
-                            timeslotId: slot._id,
-                            roomId: room._id
-                        });
-                        moveOccupancy(entryToMove, slot._id, room._id);
-
-                        resolvedCount++;
-                        resolutionLog.push({
-                            type: 'section',
-                            conflict,
-                            action: {
-                                action: 'moved_and_room_changed',
-                                entryId: entryToMove._id,
-                                courseName: entryToMove.courseId?.name || 'Unknown Course',
-                                courseType: entryToMove.courseId?.courseType || 'N/A',
-                                sectionName: entryToMove.sectionId?.name || 'Unknown Section',
-                                facultyName: entryToMove.facultyId?.name || 'Unknown Faculty',
-                                originalTimeslot: { day: originalTimeslot?.day || 'N/A', slot: originalTimeslot?.slot || 'N/A' },
-                                newTimeslot: { day: slot.day, slot: slot.slot },
-                                originalRoom: entryToMove.roomId?.name || 'Unknown Room',
-                                newRoom: room.name || 'Unknown Room',
-                                from: conflict.timeslotId,
-                                to: slot._id,
-                                newRoomId: room._id,
-                                reason: 'Section conflict resolved by rescheduling and changing room'
-                            }
-                        });
-                        break;
-                    }
-                }
-                // If we resolved within the inner loop, break the outer
-                if (resolutionLog.length > 0 && resolutionLog[resolutionLog.length - 1].conflict === conflict) break;
-            }
+        const resolved = await resolveSectionConflict(conflict, proposalId);
+        if (resolved) {
+            resolvedCount++;
+            resolutionLog.push({
+                type: 'section',
+                conflict: conflict,
+                action: resolved
+            });
         }
     }
 
@@ -348,5 +93,378 @@ const resolveConflicts = async (proposalId) => {
         remainingConflictDetails: remainingConflicts
     };
 };
+
+/**
+ * Resolve a faculty conflict by finding an alternative timeslot
+ */
+async function resolveFacultyConflict(conflict, proposalId) {
+    try {
+        // Find the conflicting timetable entries
+        const entries = await Timetable.find({
+            facultyId: conflict.entityId,
+            timeslotId: conflict.timeslotId,
+            proposalId: proposalId
+        }).populate('sectionId').populate('courseId').populate('roomId').populate('facultyId').populate('timeslotId');
+
+        if (entries.length < 2) return null;
+
+        // Try to move the second entry to a different timeslot
+        const entryToMove = entries[1];
+        const originalTimeslot = entryToMove.timeslotId;
+
+        // Find all available timeslots
+        const allSlots = await TimeSlot.find();
+
+        for (const slot of allSlots) {
+            // Skip the current slot
+            if (slot._id.toString() === conflict.timeslotId.toString()) continue;
+
+            // Check if faculty is available
+            const facultyAvailable = await checkFacultyAvailability(
+                entryToMove.facultyId._id,
+                slot._id,
+                proposalId
+            );
+            if (!facultyAvailable) continue;
+
+            // Check if section is free
+            const sectionFree = await checkResourceFree(
+                'sectionId',
+                entryToMove.sectionId._id,
+                slot._id,
+                proposalId
+            );
+            if (!sectionFree) continue;
+
+            // Check if room is free
+            const roomFree = await checkResourceFree(
+                'roomId',
+                entryToMove.roomId._id,
+                slot._id,
+                proposalId
+            );
+
+            if (roomFree) {
+                // Move the entry to this slot
+                await Timetable.findByIdAndUpdate(entryToMove._id, {
+                    timeslotId: slot._id
+                });
+
+                return {
+                    action: 'moved',
+                    entryId: entryToMove._id,
+                    courseName: entryToMove.courseId?.name || 'Unknown Course',
+                    courseType: entryToMove.courseId?.courseType || 'N/A',
+                    sectionName: entryToMove.sectionId?.name || 'Unknown Section',
+                    facultyName: entryToMove.facultyId?.name || 'Unknown Faculty',
+                    roomName: entryToMove.roomId?.name || 'Unknown Room',
+                    originalTimeslot: {
+                        day: originalTimeslot?.day || 'N/A',
+                        slot: originalTimeslot?.slot || 'N/A'
+                    },
+                    newTimeslot: {
+                        day: slot.day,
+                        slot: slot.slot
+                    },
+                    from: conflict.timeslotId,
+                    to: slot._id,
+                    reason: 'Faculty conflict resolved by rescheduling'
+                };
+            }
+        }
+
+        return null;
+    } catch (error) {
+        console.error('Error resolving faculty conflict:', error);
+        return null;
+    }
+}
+
+/**
+ * Resolve a room conflict by finding an alternative room or timeslot
+ */
+async function resolveRoomConflict(conflict, proposalId) {
+    try {
+        // Find the conflicting timetable entries
+        const entries = await Timetable.find({
+            roomId: conflict.entityId,
+            timeslotId: conflict.timeslotId,
+            proposalId: proposalId
+        }).populate('sectionId').populate('courseId').populate('roomId').populate('facultyId').populate('timeslotId');
+
+        if (entries.length < 2) return null;
+
+        // Try to move the second entry to a different room
+        const entryToMove = entries[1];
+        const originalRoom = entryToMove.roomId;
+        const originalTimeslot = entryToMove.timeslotId;
+
+        // Find alternative rooms of the same type
+        const alternativeRooms = await Room.find({
+            roomType: originalRoom.roomType,
+            capacity: { $gte: entryToMove.sectionId.studentCount },
+            _id: { $ne: originalRoom._id }
+        });
+
+        for (const room of alternativeRooms) {
+            const roomFree = await checkResourceFree(
+                'roomId',
+                room._id,
+                conflict.timeslotId,
+                proposalId
+            );
+
+            if (roomFree) {
+                // Move to this room
+                await Timetable.findByIdAndUpdate(entryToMove._id, {
+                    roomId: room._id
+                });
+
+                return {
+                    action: 'room_changed',
+                    entryId: entryToMove._id,
+                    courseName: entryToMove.courseId?.name || 'Unknown Course',
+                    courseType: entryToMove.courseId?.courseType || 'N/A',
+                    sectionName: entryToMove.sectionId?.name || 'Unknown Section',
+                    facultyName: entryToMove.facultyId?.name || 'Unknown Faculty',
+                    timeslot: {
+                        day: originalTimeslot?.day || 'N/A',
+                        slot: originalTimeslot?.slot || 'N/A'
+                    },
+                    originalRoom: originalRoom.name || 'Unknown Room',
+                    newRoom: room.name || 'Unknown Room',
+                    from: originalRoom._id,
+                    to: room._id,
+                    reason: 'Room conflict resolved by changing room'
+                };
+            }
+        }
+
+        // If no alternative room found, try to reschedule
+        const allSlots = await TimeSlot.find();
+
+        for (const slot of allSlots) {
+            if (slot._id.toString() === conflict.timeslotId.toString()) continue;
+
+            const facultyAvailable = await checkFacultyAvailability(
+                entryToMove.facultyId._id,
+                slot._id,
+                proposalId
+            );
+            if (!facultyAvailable) continue;
+
+            const sectionFree = await checkResourceFree(
+                'sectionId',
+                entryToMove.sectionId._id,
+                slot._id,
+                proposalId
+            );
+            if (!sectionFree) continue;
+
+            const roomFree = await checkResourceFree(
+                'roomId',
+                originalRoom._id,
+                slot._id,
+                proposalId
+            );
+
+            if (roomFree) {
+                await Timetable.findByIdAndUpdate(entryToMove._id, {
+                    timeslotId: slot._id
+                });
+
+                return {
+                    action: 'moved',
+                    entryId: entryToMove._id,
+                    courseName: entryToMove.courseId?.name || 'Unknown Course',
+                    courseType: entryToMove.courseId?.courseType || 'N/A',
+                    sectionName: entryToMove.sectionId?.name || 'Unknown Section',
+                    facultyName: entryToMove.facultyId?.name || 'Unknown Faculty',
+                    roomName: originalRoom.name || 'Unknown Room',
+                    originalTimeslot: {
+                        day: originalTimeslot?.day || 'N/A',
+                        slot: originalTimeslot?.slot || 'N/A'
+                    },
+                    newTimeslot: {
+                        day: slot.day,
+                        slot: slot.slot
+                    },
+                    from: conflict.timeslotId,
+                    to: slot._id,
+                    reason: 'Room conflict resolved by rescheduling'
+                };
+            }
+        }
+
+        return null;
+    } catch (error) {
+        console.error('Error resolving room conflict:', error);
+        return null;
+    }
+}
+
+/**
+ * Resolve a section conflict by rescheduling one of the classes
+ */
+async function resolveSectionConflict(conflict, proposalId) {
+    try {
+        // Find the conflicting timetable entries
+        const entries = await Timetable.find({
+            sectionId: conflict.entityId,
+            timeslotId: conflict.timeslotId,
+            proposalId: proposalId
+        }).populate('sectionId').populate('courseId').populate('roomId').populate('facultyId').populate('timeslotId');
+
+        if (entries.length < 2) return null;
+
+        // Try to move the second entry to a different timeslot
+        const entryToMove = entries[1];
+        const originalTimeslot = entryToMove.timeslotId;
+
+        const allSlots = await TimeSlot.find();
+
+        for (const slot of allSlots) {
+            if (slot._id.toString() === conflict.timeslotId.toString()) continue;
+
+            // Check if faculty is available
+            const facultyAvailable = await checkFacultyAvailability(
+                entryToMove.facultyId._id,
+                slot._id,
+                proposalId
+            );
+            if (!facultyAvailable) continue;
+
+            // Check if section is free
+            const sectionFree = await checkResourceFree(
+                'sectionId',
+                entryToMove.sectionId._id,
+                slot._id,
+                proposalId
+            );
+            if (!sectionFree) continue;
+
+            // Try to find a free room
+            const roomFree = await checkResourceFree(
+                'roomId',
+                entryToMove.roomId._id,
+                slot._id,
+                proposalId
+            );
+
+            if (roomFree) {
+                await Timetable.findByIdAndUpdate(entryToMove._id, {
+                    timeslotId: slot._id
+                });
+
+                return {
+                    action: 'moved',
+                    entryId: entryToMove._id,
+                    courseName: entryToMove.courseId?.name || 'Unknown Course',
+                    courseType: entryToMove.courseId?.courseType || 'N/A',
+                    sectionName: entryToMove.sectionId?.name || 'Unknown Section',
+                    facultyName: entryToMove.facultyId?.name || 'Unknown Faculty',
+                    roomName: entryToMove.roomId?.name || 'Unknown Room',
+                    originalTimeslot: {
+                        day: originalTimeslot?.day || 'N/A',
+                        slot: originalTimeslot?.slot || 'N/A'
+                    },
+                    newTimeslot: {
+                        day: slot.day,
+                        slot: slot.slot
+                    },
+                    from: conflict.timeslotId,
+                    to: slot._id,
+                    reason: 'Section conflict resolved by rescheduling'
+                };
+            } else {
+                // Try to find an alternative room
+                const alternativeRooms = await Room.find({
+                    roomType: entryToMove.roomId.roomType,
+                    capacity: { $gte: entryToMove.sectionId.studentCount }
+                });
+
+                for (const room of alternativeRooms) {
+                    const altRoomFree = await checkResourceFree(
+                        'roomId',
+                        room._id,
+                        slot._id,
+                        proposalId
+                    );
+
+                    if (altRoomFree) {
+                        await Timetable.findByIdAndUpdate(entryToMove._id, {
+                            timeslotId: slot._id,
+                            roomId: room._id
+                        });
+
+                        return {
+                            action: 'moved_and_room_changed',
+                            entryId: entryToMove._id,
+                            courseName: entryToMove.courseId?.name || 'Unknown Course',
+                            courseType: entryToMove.courseId?.courseType || 'N/A',
+                            sectionName: entryToMove.sectionId?.name || 'Unknown Section',
+                            facultyName: entryToMove.facultyId?.name || 'Unknown Faculty',
+                            originalTimeslot: {
+                                day: originalTimeslot?.day || 'N/A',
+                                slot: originalTimeslot?.slot || 'N/A'
+                            },
+                            newTimeslot: {
+                                day: slot.day,
+                                slot: slot.slot
+                            },
+                            originalRoom: entryToMove.roomId?.name || 'Unknown Room',
+                            newRoom: room.name || 'Unknown Room',
+                            from: conflict.timeslotId,
+                            to: slot._id,
+                            newRoomId: room._id,
+                            reason: 'Section conflict resolved by rescheduling and changing room'
+                        };
+                    }
+                }
+            }
+        }
+
+        return null;
+    } catch (error) {
+        console.error('Error resolving section conflict:', error);
+        return null;
+    }
+}
+
+/**
+ * Check if a faculty is available at a given timeslot
+ */
+async function checkFacultyAvailability(facultyId, timeslotId, proposalId) {
+    // Check faculty availability
+    const availability = await FacultyAvailability.findOne({
+        facultyId: facultyId,
+        timeslotId: timeslotId,
+        isAvailable: false
+    });
+
+    if (availability) return false;
+
+    // Check if faculty is already scheduled
+    const existing = await Timetable.findOne({
+        facultyId: facultyId,
+        timeslotId: timeslotId,
+        proposalId: proposalId
+    });
+
+    return !existing;
+}
+
+/**
+ * Check if a resource (room/section) is free at a given timeslot
+ */
+async function checkResourceFree(field, resourceId, timeslotId, proposalId) {
+    const existing = await Timetable.findOne({
+        [field]: resourceId,
+        timeslotId: timeslotId,
+        proposalId: proposalId
+    });
+
+    return !existing;
+}
 
 module.exports = { resolveConflicts };

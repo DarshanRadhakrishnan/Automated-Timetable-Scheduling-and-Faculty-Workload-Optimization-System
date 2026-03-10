@@ -435,7 +435,6 @@ const isFacultyAvailable = async (facultyId, timeslotId) => {
 
 module.exports = {
     generateTimetable,
-    calculateScore,
     // Exports mainly for testing if needed
     isFacultyAvailable
 };

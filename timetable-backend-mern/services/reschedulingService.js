@@ -5,15 +5,6 @@ const Section = require('../models/Section');
 const TimeSlot = require('../models/TimeSlot');
 const FacultyAvailability = require('../models/FacultyAvailability');
 
-// Helper to shuffle array for randomness
-const shuffleArray = (array) => {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-};
-
 // Helper to check if a resource is busy
 const isBusy = async (field, id, timeslotId, proposalId) => {
     return await Timetable.exists({
@@ -60,48 +51,27 @@ const findSubstitutesForFaculty = async (facultyId, day, proposalId = 1) => {
         };
 
         // Strategy A: Find Substitutes (Same Slot, Different Faculty)
-        // Logic: Return ALL faculties with status (Available/Occupied)
-        const allFaculties = await Faculty.find({ _id: { $ne: facultyId } });
-
+        // Logic: Find faculties NOT busy at this slot AND not unavailable
         const busyAssignments = await Timetable.find({
             timeslotId: classEntry.timeslotId._id,
             proposalId: distinctProposalId
         }).select('facultyId');
-        const busyIds = new Set(busyAssignments.map(a => a.facultyId.toString()));
+        const busyIds = busyAssignments.map(a => a.facultyId.toString());
 
         const unavailableRecords = await FacultyAvailability.find({
             timeslotId: classEntry.timeslotId._id,
             isAvailable: false
         }).select('facultyId');
-        const unavailableIds = new Set(unavailableRecords.map(a => a.facultyId.toString()));
+        const unavailableIds = unavailableRecords.map(a => a.facultyId.toString());
 
-        options.substitutes = allFaculties.map(f => {
-            let status = 'AVAILABLE';
-            let reason = 'Available';
+        const excluded = new Set([...busyIds, ...unavailableIds, facultyId.toString()]);
 
-            if (busyIds.has(f._id.toString())) {
-                status = 'OCCUPIED';
-                reason = 'Has another class';
-            } else if (unavailableIds.has(f._id.toString())) {
-                status = 'OCCUPIED';
-                reason = 'Marked unavailable';
-            }
-
-            return {
-                _id: f._id,
-                name: f.name,
-                department: f.department,
-                status: status,
-                reason: reason
-            };
-        });
-
-        // Sort: Available first
-        options.substitutes.sort((a, b) => {
-            if (a.status === 'AVAILABLE' && b.status !== 'AVAILABLE') return -1;
-            if (a.status !== 'AVAILABLE' && b.status === 'AVAILABLE') return 1;
-            return a.name.localeCompare(b.name);
-        });
+        const candidateFaculties = await Faculty.find({ _id: { $nin: Array.from(excluded) } });
+        options.substitutes = candidateFaculties.map(f => ({
+            _id: f._id,
+            name: f.name,
+            reason: 'Available at this slot'
+        }));
 
         // Strategy B: Reschedule (Different Slot, Same Faculty? NO. Faculty is away.)
         // Unless we reschedule to a DIFFERENT DAY.
@@ -110,8 +80,7 @@ const findSubstitutesForFaculty = async (facultyId, day, proposalId = 1) => {
         // 2. Section is FREE.
         // 3. Room is FREE (or find new room).
 
-        let allSlots = await TimeSlot.find({ day: { $ne: day } }); // Exclude the leave day
-        allSlots = shuffleArray(allSlots); // Randomize to avoid bias (e.g. always Monday)
+        const allSlots = await TimeSlot.find({ day: { $ne: day } }); // Exclude the leave day
         let potentialSlots = [];
 
         for (const slot of allSlots) {
@@ -221,9 +190,7 @@ const findAlternativeRooms = async (roomId, day, proposalId = 1) => {
         // So Strategy B is: Same Faculty/Section/Room, Diff Time (on a day where Room IS available).
         // OR Same Faculty/Section, Diff Time, New Room.
         // Let's just look for "Move this class to a free slot (Faculty+Section free)".
-        // Let's just look for "Move this class to a free slot (Faculty+Section free)".
-        let allSlots = await TimeSlot.find({ day: { $ne: day } }); // Assume unavailable for whole day?
-        allSlots = shuffleArray(allSlots); // Randomize
+        const allSlots = await TimeSlot.find({ day: { $ne: day } }); // Assume unavailable for whole day?
         // If unavailable for specific slots, we could check others on same day. 
         // But day input implies day closure.
 
@@ -276,8 +243,7 @@ const rescheduleHoliday = async (day, proposalId = 1) => {
 
     const results = [];
     // We want to find make-up slots for EVERY affected class
-    let allTimeSlots = await TimeSlot.find({ day: { $ne: day } });
-    allTimeSlots = shuffleArray(allTimeSlots); // Randomize check order
+    const allTimeSlots = await TimeSlot.find({ day: { $ne: day } });
 
     for (const classEntry of affectedClasses) {
         const potentialSlots = [];
