@@ -19,7 +19,7 @@ interface RoomResult {
     id: string; type: string; timestamp: string;
     impactScore: number; severity: 'CRITICAL' | 'HIGH' | 'MEDIUM';
     classesAffected: number; studentsImpacted: number;
-    recommendations: string[]; roomName: string; alternativesFound: number;
+    recommendations: string[]; roomName: string; roomType?: string; alternativesFound: number;
     alternativeRooms: { id: string; name: string; capacity: number; type: string; }[];
 }
 
