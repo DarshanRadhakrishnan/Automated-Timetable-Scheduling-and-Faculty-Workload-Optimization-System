@@ -1,5 +1,7 @@
 'use client';
 
+import { useAuth } from '@/context/AuthContext';
+
 import React, { useEffect, useState } from 'react';
 import {
     getTimetables,
@@ -95,6 +97,8 @@ interface Stats {
 }
 
 export default function TimetablePage() {
+    const { user } = useAuth();
+    const isFaculty = user?.role === 'faculty';
     const [timetable, setTimetable] = useState<TimetableEntry[]>([]);
     const [loading, setLoading] = useState(true);
     const [detectingConflicts, setDetectingConflicts] = useState(false);
@@ -133,6 +137,11 @@ export default function TimetablePage() {
         try {
             const data = await getRankings();
             setRankings(data);
+            if (data && data.length > 0) {
+                // Automatically display the best/recently generated one
+                const bestProposalId = data[0].id || 1;
+                setSelectedProposal(bestProposalId);
+            }
         } catch (error) {
             console.error('Failed to fetch rankings:', error);
         }
@@ -160,7 +169,7 @@ export default function TimetablePage() {
         try {
             const data = await getTimetables(selectedProposal);
             const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-            const sortedData = data.sort((a: any, b: any) => {
+            let sortedData = data.sort((a: any, b: any) => {
                 const dayOrder = days.indexOf(a.timeslotId?.day || '') - days.indexOf(b.timeslotId?.day || '');
                 if (dayOrder !== 0) return dayOrder;
                 const slotA = a.timeslotId?.slot || 0;
@@ -168,6 +177,14 @@ export default function TimetablePage() {
                 if (slotA !== slotB) return slotA - slotB;
                 return (a.sectionId?.name || '').localeCompare(b.sectionId?.name || '');
             });
+
+            if (user?.role === 'faculty' && user?.facultyId) {
+                const facId = String(user.facultyId);
+                sortedData = sortedData.filter((entry: any) =>
+                    String(entry.facultyId?._id || entry.facultyId) === facId
+                );
+            }
+
             setTimetable(sortedData);
         } catch (error) {
             console.error('Failed to fetch timetable:', error);
@@ -356,6 +373,53 @@ export default function TimetablePage() {
                         <div className="text-sm text-gray-600 dark:text-gray-400">Scheduled Classes</div>
                     </div>
                 </div>
+
+                {/* Explainability & Visualization */}
+                {filteredTimetable.length > 0 && (
+                    <div className="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
+                        <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-3 flex items-center">
+                            🔬 Timetable Insights & Explainability
+                        </h3>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            {/* Day Distribution */}
+                            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                <h4 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-3">Classes Per Day</h4>
+                                <div className="space-y-2">
+                                    {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => {
+                                        const count = filteredTimetable.filter(t => t.timeslotId?.day === day).length;
+                                        const max = Math.max(...['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(d => filteredTimetable.filter(t => t.timeslotId?.day === d).length)) || 1;
+                                        const percentage = (count / max) * 100;
+                                        return (
+                                            <div key={day} className="flex items-center gap-3">
+                                                <div className="w-20 text-xs font-medium text-gray-600 dark:text-gray-400">{day}</div>
+                                                <div className="flex-1 h-2.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                                                    <div className="h-full bg-blue-500 rounded-full transition-all duration-500" style={{ width: `${percentage}%` }} />
+                                                </div>
+                                                <div className="w-8 text-xs font-bold text-gray-700 dark:text-gray-300 text-right">{count}</div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                            {/* Explanation Panel */}
+                            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                <h4 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
+                                    <AlertTriangle className="w-4 h-4 text-orange-500" /> Automated Optimization Context
+                                </h4>
+                                <div className="text-sm text-gray-600 dark:text-gray-400 space-y-3 mt-3">
+                                    <p>
+                                        <strong>Why this schedule?</strong> The scheduling engine automatically ranked this proposal as `{selectedProposal ? 'Optimal' : 'Standard'}` because it maximizes faculty availability while avoiding room and time conflicts.
+                                    </p>
+                                    <ul className="list-disc pl-5 space-y-1 text-xs">
+                                        <li>Ensures no Faculty is assigned to two locations at once.</li>
+                                        <li>Distributes workload to prevent back-to-back burnout.</li>
+                                        <li>Avoids double-booking Section clusters for conflicting core courses.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Quick Actions Control Panel */}
@@ -392,29 +456,33 @@ export default function TimetablePage() {
                             </button>
                         </div>
 
-                        <button
-                            onClick={handleGenerate}
-                            disabled={loading}
-                            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
-                        >
-                            {loading ? '⏳ Processing...' : <><Rocket className="w-4 h-4" /> Generate Timetable</>}
-                        </button>
-                        <button
-                            onClick={() => {
-                                setDisplayMode('timetable');
-                                setFilterMode('all');
-                            }}
-                            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-                        >
-                            <Eye className="w-4 h-4 mr-2" /> View Timetable
-                        </button>
-                        <button
-                            onClick={handleClear}
-                            disabled={loading}
-                            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:opacity-50"
-                        >
-                            <Trash2 className="w-4 h-4 mr-2" /> Clear Timetable
-                        </button>
+                        {!isFaculty && (
+                            <>
+                                <button
+                                    onClick={handleGenerate}
+                                    disabled={loading}
+                                    className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+                                >
+                                    {loading ? '⏳ Processing...' : <><Rocket className="w-4 h-4" /> Generate Timetable</>}
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setDisplayMode('timetable');
+                                        setFilterMode('all');
+                                    }}
+                                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                                >
+                                    <Eye className="w-4 h-4 mr-2" /> View Timetable
+                                </button>
+                                <button
+                                    onClick={handleClear}
+                                    disabled={loading}
+                                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:opacity-50"
+                                >
+                                    <Trash2 className="w-4 h-4 mr-2" /> Clear Timetable
+                                </button>
+                            </>
+                        )}
 
                         {/* Plan Selector */}
                         {rankings.length > 0 && (
@@ -523,45 +591,49 @@ export default function TimetablePage() {
                     </div>
                 </div>
 
-                {/* Conflict Intelligence */}
-                <div className="mb-4">
-                    <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Conflict Intelligence</h4>
-                    <div className="flex flex-wrap gap-2">
-                        <button
-                            onClick={handleDetectConflicts}
-                            disabled={detectingConflicts}
-                            className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
-                        >
-                            {detectingConflicts ? 'Scanning...' : <><Search className="w-4 h-4" /> Detect Conflicts</>}
-                        </button>
-                        <button
-                            onClick={() => setDisplayMode('conflicts')}
-                            className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors flex items-center gap-2"
-                        >
-                            <AlertTriangle className="w-4 h-4" /> View Conflicts ({conflicts.length})
-                        </button>
-                        <button
-                            onClick={handleResolveConflicts}
-                            disabled={resolvingConflicts}
-                            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
-                        >
-                            {resolvingConflicts ? 'Resolving...' : <><Wrench className="w-4 h-4" /> Resolve Conflicts</>}
-                        </button>
-                    </div>
-                </div>
+                {!isFaculty && (
+                    <>
+                        {/* Conflict Intelligence */}
+                        <div className="mb-4">
+                            <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Conflict Intelligence</h4>
+                            <div className="flex flex-wrap gap-2">
+                                <button
+                                    onClick={handleDetectConflicts}
+                                    disabled={detectingConflicts}
+                                    className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+                                >
+                                    {detectingConflicts ? 'Scanning...' : <><Search className="w-4 h-4" /> Detect Conflicts</>}
+                                </button>
+                                <button
+                                    onClick={() => setDisplayMode('conflicts')}
+                                    className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors flex items-center gap-2"
+                                >
+                                    <AlertTriangle className="w-4 h-4" /> View Conflicts ({conflicts.length})
+                                </button>
+                                <button
+                                    onClick={handleResolveConflicts}
+                                    disabled={resolvingConflicts}
+                                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+                                >
+                                    {resolvingConflicts ? 'Resolving...' : <><Wrench className="w-4 h-4" /> Resolve Conflicts</>}
+                                </button>
+                            </div>
+                        </div>
 
-                {/* Advanced Tools */}
-                <div>
-                    <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Advanced Tools</h4>
-                    <div className="flex flex-wrap gap-2">
-                        <button
-                            onClick={() => setDynamicReschedulingOpen(true)}
-                            className="w-full sm:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md transition-all flex items-center justify-center gap-2 font-medium"
-                        >
-                            <RefreshCcw className="w-5 h-5" /> Dynamic Rescheduling
-                        </button>
-                    </div>
-                </div>
+                        {/* Advanced Tools */}
+                        <div>
+                            <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Advanced Tools</h4>
+                            <div className="flex flex-wrap gap-2">
+                                <button
+                                    onClick={() => setDynamicReschedulingOpen(true)}
+                                    className="w-full sm:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md transition-all flex items-center justify-center gap-2 font-medium"
+                                >
+                                    <RefreshCcw className="w-5 h-5" /> Dynamic Rescheduling
+                                </button>
+                            </div>
+                        </div>
+                    </>
+                )}
             </div>
 
             {/* Message Display */}

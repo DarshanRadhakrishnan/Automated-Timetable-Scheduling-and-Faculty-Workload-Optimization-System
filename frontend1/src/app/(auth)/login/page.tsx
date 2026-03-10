@@ -26,6 +26,7 @@ export default function LoginPage() {
                 username: res.data.username,
                 email: res.data.email,
                 role: res.data.role,
+                facultyId: res.data.facultyId,
             });
         } catch (err: any) {
             setError(
@@ -147,6 +148,12 @@ export default function LoginPage() {
 
                     <p className="mt-8 text-center text-xs text-gray-600">
                         Default credentials: <span className="text-gray-400">admin@timetable.com</span> / <span className="text-gray-400">Admin@123</span>
+                    </p>
+                    <p className="mt-4 text-center text-sm text-gray-400">
+                        Do not have an account?{' '}
+                        <Link href="/register" className="text-blue-400 hover:text-blue-300 font-medium">
+                            Sign Up
+                        </Link>
                     </p>
                 </div>
             </div>

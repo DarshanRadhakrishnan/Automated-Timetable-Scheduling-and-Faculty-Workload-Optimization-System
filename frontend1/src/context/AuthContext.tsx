@@ -8,6 +8,7 @@ interface User {
     username: string;
     email: string;
     role: string;
+    facultyId?: string;
 }
 
 interface AuthContextType {

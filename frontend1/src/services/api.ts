@@ -32,7 +32,7 @@ const api = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
-    timeout: 30000, // 30 seconds default timeout (up from 10 s)
+    timeout: 12000, // Reduced from 30s to 12s to avoid UI stalling
 });
 
 // Separate instance for long-running operations (conflict detection, generation, etc.)
@@ -76,16 +76,21 @@ api.interceptors.request.use((config) => {
 });
 
 // ── Retry logic (exponential backoff) ───────────────────────
-const RETRY_CODES = new Set([408, 429, 500, 502, 503, 504]);
-const MAX_RETRIES = 2;
+const RETRY_CODES = new Set([429, 500, 502, 503, 504]);
+const MAX_RETRIES = 1;
 
 function shouldRetry(error: AxiosError) {
     if (!error.config) return false;
     const retries = (error.config as any).__retryCount || 0;
     if (retries >= MAX_RETRIES) return false;
 
-    // Retry on network errors or specific status codes
-    if (!error.response) return true; // network / timeout
+    // Do not retry on timeouts to prevent massive UI stalling
+    if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+        return false;
+    }
+
+    // Retry on true network errors or specific status codes
+    if (!error.response) return true;
     return RETRY_CODES.has(error.response.status);
 }
 
@@ -93,9 +98,10 @@ async function retryInterceptor(error: AxiosError) {
     if (shouldRetry(error)) {
         const config = error.config as InternalAxiosRequestConfig & { __retryCount?: number };
         config.__retryCount = (config.__retryCount || 0) + 1;
-        const delay = Math.min(1000 * 2 ** (config.__retryCount - 1), 5000);
+        const delay = Math.min(1000 * 2 ** (config.__retryCount - 1), 3000);
         await new Promise((r) => setTimeout(r, delay));
-        return axios(config);
+        // Use the original instance if possible to retain interceptor contexts
+        return config.timeout === 180000 ? apiLongRunning.request(config) : api.request(config);
     }
     return Promise.reject(error);
 }

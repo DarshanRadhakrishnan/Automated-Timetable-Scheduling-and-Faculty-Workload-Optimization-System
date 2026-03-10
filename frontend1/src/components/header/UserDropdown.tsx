@@ -5,10 +5,10 @@ import React, { useState } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 
-import { useUser } from "@/context/UserContext";
+import { useAuth } from "@/context/AuthContext";
 
 export default function UserDropdown() {
-  const { user } = useUser();
+  const { user, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
 
   function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
@@ -19,22 +19,23 @@ export default function UserDropdown() {
   function closeDropdown() {
     setIsOpen(false);
   }
+
+  // Fallbacks if user is null during loading
+  const username = user?.username || "Guest";
+  const email = user?.email || "";
+  const initial = username.charAt(0).toUpperCase();
+
   return (
     <div className="relative">
       <button
         onClick={toggleDropdown}
         className="flex items-center text-gray-700 dark:text-gray-400 dropdown-toggle"
       >
-        <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
-          <Image
-            width={44}
-            height={44}
-            src={user.photo}
-            alt="User"
-          />
+        <span className="mr-3 flex items-center justify-center overflow-hidden rounded-full h-11 w-11 bg-blue-500 text-white font-bold text-lg">
+          {initial}
         </span>
 
-        <span className="block mr-1 font-medium text-theme-sm">{user.firstName}</span>
+        <span className="block mr-1 font-medium text-theme-sm">{username}</span>
 
         <svg
           className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
@@ -62,10 +63,10 @@ export default function UserDropdown() {
       >
         <div>
           <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            {user.firstName} {user.lastName}
+            {username}
           </span>
           <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-            {user.email}
+            {email}
           </span>
         </div>
 

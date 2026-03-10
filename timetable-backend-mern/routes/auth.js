@@ -156,24 +156,59 @@ router.post('/register/admin', verifyToken, authorize(['admin']), async (req, re
 });
 
 // ─────────────────────────────────────────────
-// LEGACY generic register (kept for backward compat, defaults to student)
-// POST /api/auth/register
+// OPEN REGISTER — Create Users (Admin / Faculty)
+// POST /api/auth/register/open
+// Body: { username, email, password, role, department, maxLoad }
 // ─────────────────────────────────────────────
-router.post('/register', async (req, res) => {
+router.post('/register/open', async (req, res) => {
     try {
-        const hashedPassword = await hashPassword(req.body.password);
-        const newUser = new User({
-            username: req.body.username,
-            email: req.body.email,
-            password: hashedPassword,
-            role: req.body.role || 'student',
-            sectionId: req.body.sectionId || null,
-            facultyId: req.body.facultyId || null
-        });
-        const user = await newUser.save();
-        res.status(200).json(user);
+        const { username, email, password, role, department, maxLoad } = req.body;
+
+        if (!username || !email || !password || !role) {
+            return res.status(400).json({ message: 'username, email, password, and role are required.' });
+        }
+
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(409).json({ message: 'Email already exists.' });
+        }
+
+        const hashedPassword = await hashPassword(password);
+
+        if (role === 'faculty') {
+            const newFac = new Faculty({ name: username, email, department: department || 'General', maxLoad: maxLoad || 15 });
+            const savedFac = await newFac.save();
+
+            const newUser = new User({
+                username,
+                email,
+                password: hashedPassword,
+                role: 'faculty',
+                facultyId: savedFac._id
+            });
+            const user = await newUser.save();
+            const accessToken = signToken(user);
+            const { password: _p, ...userInfo } = user._doc;
+            return res.status(201).json({ ...userInfo, accessToken });
+        } else if (role === 'admin') {
+            const newUser = new User({
+                username,
+                email,
+                password: hashedPassword,
+                role: 'admin'
+            });
+            const user = await newUser.save();
+            const accessToken = signToken(user);
+            const { password: _p, ...userInfo } = user._doc;
+            return res.status(201).json({ ...userInfo, accessToken });
+        } else {
+            return res.status(400).json({ message: 'Role must be admin or faculty.' });
+        }
     } catch (err) {
-        res.status(500).json(err);
+        if (err.code === 11000) {
+            return res.status(409).json({ message: 'Email or username already in use.' });
+        }
+        res.status(500).json({ message: 'Registration failed.', error: err.message });
     }
 });
 
