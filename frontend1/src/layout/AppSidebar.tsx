@@ -15,67 +15,40 @@ import {
   UserCircleIcon,
 } from "../icons/index";
 
+import { useAuth } from "@/context/AuthContext";
+
 type NavItem = {
-  name: string;
   icon: React.ReactNode;
-  path?: string;
-  subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
+  name: string;
+  path: string;
+  roles?: string[];
+  subItems?: any;
 };
 
-const navItems: NavItem[] = [
-  {
-    icon: <GridIcon />,
-    name: "Dashboard",
-    path: "/",
-  },
-  {
-    icon: <UserCircleIcon />,
-    name: "Faculty",
-    path: "/faculty",
-  },
-  {
-    icon: <BoxCubeIcon />,
-    name: "Courses",
-    path: "/course",
-  },
-  {
-    icon: <TableIcon />,
-    name: "Rooms",
-    path: "/room",
-  },
-  {
-    icon: <ListIcon />,
-    name: "Sections",
-    path: "/section",
-  },
-  {
-    icon: <CalenderIcon />,
-    name: "Timeslots",
-    path: "/timeslot",
-  },
-  {
-    icon: <PageIcon />,
-    name: "Timetable",
-    path: "/timetable",
-  },
-  {
-    icon: <GridIcon />,
-    name: "Analytics",
-    path: "/analytics",
-  },
-  {
-    icon: <TableIcon />,
-    name: "Audit Log",
-    path: "/auditlog",
-  },
+const allNavItems: NavItem[] = [
+  { icon: <GridIcon />, name: "Dashboard", path: "/", roles: ['admin'] },
+  { icon: <UserCircleIcon />, name: "Faculty", path: "/faculty", roles: ['admin'] },
+  { icon: <BoxCubeIcon />, name: "Courses", path: "/course", roles: ['admin'] },
+  { icon: <TableIcon />, name: "Rooms", path: "/room", roles: ['admin'] },
+  { icon: <ListIcon />, name: "Sections", path: "/section", roles: ['admin'] },
+  { icon: <CalenderIcon />, name: "Timeslots", path: "/timeslot", roles: ['admin'] },
+  { icon: <PageIcon />, name: "Timetable", path: "/timetable", roles: ['admin', 'faculty'] },
+  { icon: <GridIcon />, name: "Leave Requests", path: "/leave", roles: ['admin', 'faculty'] },
+  { icon: <GridIcon />, name: "Analytics", path: "/analytics", roles: ['admin'] },
+  { icon: <TableIcon />, name: "Audit Log", path: "/auditlog", roles: ['admin'] },
 ];
-
 
 const othersItems: NavItem[] = [];
 
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
+  const { user } = useAuth();
+
+  const navItems = allNavItems.filter((item) => {
+    if (!item.roles) return true;
+    return user?.role && item.roles.includes(user.role);
+  });
 
   const renderMenuItems = (
     navItems: NavItem[],
@@ -151,7 +124,7 @@ const AppSidebar: React.FC = () => {
               }}
             >
               <ul className="mt-2 space-y-1 ml-9">
-                {nav.subItems.map((subItem) => (
+                {nav.subItems.map((subItem: any) => (
                   <li key={subItem.name}>
                     <Link
                       href={subItem.path}
@@ -211,9 +184,9 @@ const AppSidebar: React.FC = () => {
     let submenuMatched = false;
     ["main", "others"].forEach((menuType) => {
       const items = menuType === "main" ? navItems : othersItems;
-      items.forEach((nav, index) => {
+      items.forEach((nav: any, index: number) => {
         if (nav.subItems) {
-          nav.subItems.forEach((subItem) => {
+          nav.subItems.forEach((subItem: any) => {
             if (isActive(subItem.path)) {
               setOpenSubmenu({
                 type: menuType as "main" | "others",
@@ -230,7 +203,7 @@ const AppSidebar: React.FC = () => {
     if (!submenuMatched) {
       setOpenSubmenu(null);
     }
-  }, [pathname, isActive]);
+  }, [pathname, isActive, navItems]);
 
   useEffect(() => {
     // Set the height of the submenu items when the submenu is opened
