@@ -122,6 +122,35 @@ router.get('/', async (req, res) => {
     }
 });
 
+// Get dashboard stats
+router.get('/stats', async (req, res) => {
+    try {
+        const [totalFaculties, totalCourses, totalRooms, totalSections, scheduledClasses] = await Promise.all([
+            Faculty.countDocuments(),
+            Course.countDocuments(),
+            Room.countDocuments(),
+            Section.countDocuments(),
+            Timetable.countDocuments()
+        ]);
+
+        res.json({
+            message: 'Stats retrieved successfully',
+            data: {
+                totalFaculties,
+                totalCourses,
+                totalRooms,
+                totalSections,
+                scheduledClasses
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error retrieving stats',
+            error: error.message
+        });
+    }
+});
+
 // Get specific timetable entry
 router.get('/:id', async (req, res) => {
     try {

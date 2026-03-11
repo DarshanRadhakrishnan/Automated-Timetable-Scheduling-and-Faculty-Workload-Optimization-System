@@ -51,40 +51,40 @@ export default function Ecommerce() {
         title="Total Faculties"
         total={stats.faculties.toString()}
         icon={<UserCircleIcon className="fill-primary dark:fill-white" />}
-        color="text-blue-600 bg-blue-100 dark:bg-blue-900/30"
+        color="text-slate-700 bg-slate-100 dark:bg-slate-800 dark:text-slate-300"
       />
       <Card
         title="Total Courses"
         total={stats.courses.toString()}
         icon={<BoxCubeIcon className="fill-primary dark:fill-white" />}
-        color="text-green-600 bg-green-100 dark:bg-green-900/30"
+        color="text-slate-700 bg-slate-100 dark:bg-slate-800 dark:text-slate-300"
       />
       <Card
         title="Total Rooms"
         total={stats.rooms.toString()}
         icon={<TableIcon className="fill-primary dark:fill-white" />}
-        color="text-orange-600 bg-orange-100 dark:bg-orange-900/30"
+        color="text-slate-700 bg-slate-100 dark:bg-slate-800 dark:text-slate-300"
       />
       <Card
         title="Total Sections"
         total={stats.sections.toString()}
         icon={<ListIcon className="fill-primary dark:fill-white" />}
-        color="text-purple-600 bg-purple-100 dark:bg-purple-900/30"
+        color="text-slate-700 bg-slate-100 dark:bg-slate-800 dark:text-slate-300"
       />
       <div className='col-span-full'>
         <Card
           title="Scheduled Classes"
           total={stats.scheduledClasses.toString()}
           icon={<PageIcon className="fill-primary dark:fill-white" />}
-          color="text-indigo-600 bg-indigo-100 dark:bg-indigo-900/30"
+          color="text-slate-700 bg-slate-100 dark:bg-slate-800 dark:text-slate-300"
         />
       </div>
 
-      <div className="col-span-full bg-white dark:bg-gray-900 p-6 rounded-xl border border-gray-200 dark:border-gray-800">
-        <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">System Status</h2>
-        <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
+      <div className="col-span-full bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
+        <h2 className="text-xl font-semibold text-slate-800 dark:text-white mb-4">System Status</h2>
+        <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
           <CheckCircleIcon className="w-6 h-6" />
-          <span className="font-medium">Server is running! ✅</span>
+          <span className="font-medium">Server is running.</span>
         </div>
       </div>
     </div>

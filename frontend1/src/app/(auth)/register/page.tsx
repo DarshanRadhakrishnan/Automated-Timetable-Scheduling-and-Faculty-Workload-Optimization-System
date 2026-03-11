@@ -1,6 +1,5 @@
 "use client";
 import { useState } from 'react';
-// Removed useAuth import
 import axios from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -13,7 +12,6 @@ export default function RegisterPage() {
     const [department, setDepartment] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    // Removed useAuth
     const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -43,63 +41,58 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="flex min-h-screen bg-gray-950">
+        <div className="flex min-h-screen bg-slate-50 text-slate-900 font-sans">
             {/* Left panel — branding */}
-            <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 bg-gradient-to-br from-green-700 via-green-600 to-teal-700 relative overflow-hidden">
-                {/* decorative circles */}
-                <div className="absolute -top-20 -left-20 w-80 h-80 rounded-full bg-white/5 blur-xl" />
-                <div className="absolute -bottom-20 -right-20 w-96 h-96 rounded-full bg-white/5 blur-2xl" />
-
+            <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 bg-slate-900 text-slate-100">
                 <div className="relative z-10">
-                    <h1 className="text-3xl font-extrabold text-white tracking-tight">
-                        Timetable<span className="text-yellow-300">Scheduler</span>
+                    <h1 className="text-3xl font-bold tracking-tight">
+                        Timetable Scheduler
                     </h1>
-                    <p className="mt-1 text-green-200 text-sm">Join the ecosystem today!</p>
+                    <p className="mt-2 text-slate-400 text-sm">Join the ecosystem today.</p>
                 </div>
 
                 <div className="relative z-10 space-y-6">
-                    <blockquote className="text-white/90 text-xl font-medium leading-relaxed">
+                    <blockquote className="text-slate-300 text-lg font-normal leading-relaxed">
                         "Seamless integration for Faculty and Admin with smart RBAC."
                     </blockquote>
                     <div className="flex gap-4">
                         {['Fast', 'Secure', 'Optimized'].map(tag => (
-                            <span key={tag} className="px-3 py-1 rounded-full bg-white/15 text-white text-xs font-semibold backdrop-blur-sm">
+                            <span key={tag} className="px-3 py-1 rounded-full border border-slate-700 text-slate-300 text-xs font-medium">
                                 {tag}
                             </span>
                         ))}
                     </div>
                 </div>
 
-                <p className="relative z-10 text-green-200 text-xs">
+                <p className="relative z-10 text-slate-500 text-xs">
                     © {new Date().getFullYear()} TimetableScheduler. All rights reserved.
                 </p>
             </div>
 
             {/* Right panel — form */}
-            <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 lg:px-16 overflow-y-auto">
+            <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 lg:px-16 bg-white overflow-y-auto">
                 {/* Mobile logo */}
                 <div className="lg:hidden mb-8 text-center">
-                    <h1 className="text-2xl font-extrabold text-white tracking-tight">
-                        Timetable<span className="text-green-400">Scheduler</span>
+                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+                        Timetable Scheduler
                     </h1>
                 </div>
 
                 <div className="w-full max-w-md">
                     <div className="mb-8">
-                        <h2 className="text-3xl font-bold text-white">Create Account 🚀</h2>
-                        <p className="mt-2 text-gray-400 text-sm">Register as Faculty or Admin to get started.</p>
+                        <h2 className="text-2xl font-semibold text-slate-900">Create Account</h2>
+                        <p className="mt-2 text-slate-500 text-sm">Register as Faculty or Admin to get started.</p>
                     </div>
 
                     {error && (
-                        <div className="mb-6 flex items-start gap-3 rounded-lg bg-red-500/10 border border-red-500/30 p-4 text-sm text-red-400">
-                            <span>⚠️</span>
+                        <div className="mb-6 flex items-start gap-3 rounded bg-red-50 border border-red-200 p-4 text-sm text-red-700">
                             <span>{error}</span>
                         </div>
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
-                            <label className="mb-1.5 block text-sm font-medium text-gray-300">
+                            <label className="mb-1.5 block text-sm font-medium text-slate-700">
                                 Username
                             </label>
                             <input
@@ -109,12 +102,12 @@ export default function RegisterPage() {
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 placeholder="johndoe"
-                                className="w-full rounded-lg border border-gray-700 bg-gray-900 px-4 py-2 text-white placeholder-gray-600 text-sm focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/40 transition-all"
+                                className="w-full rounded border border-slate-300 bg-white px-4 py-2 text-slate-900 placeholder-slate-400 text-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 transition-colors"
                             />
                         </div>
 
                         <div>
-                            <label className="mb-1.5 block text-sm font-medium text-gray-300">
+                            <label className="mb-1.5 block text-sm font-medium text-slate-700">
                                 Email address
                             </label>
                             <input
@@ -125,18 +118,18 @@ export default function RegisterPage() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="name@timetable.com"
-                                className="w-full rounded-lg border border-gray-700 bg-gray-900 px-4 py-2 text-white placeholder-gray-600 text-sm focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/40 transition-all"
+                                className="w-full rounded border border-slate-300 bg-white px-4 py-2 text-slate-900 placeholder-slate-400 text-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 transition-colors"
                             />
                         </div>
 
                         <div>
-                            <label className="mb-1.5 block text-sm font-medium text-gray-300">
+                            <label className="mb-1.5 block text-sm font-medium text-slate-700">
                                 Role
                             </label>
                             <select
                                 value={role}
                                 onChange={(e) => setRole(e.target.value)}
-                                className="w-full rounded-lg border border-gray-700 bg-gray-900 px-4 py-2 text-white text-sm focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/40 transition-all"
+                                className="w-full rounded border border-slate-300 bg-white px-4 py-2 text-slate-900 text-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 transition-colors"
                             >
                                 <option value="faculty">Faculty</option>
                                 <option value="admin">Admin</option>
@@ -145,7 +138,7 @@ export default function RegisterPage() {
 
                         {role === 'faculty' && (
                             <div>
-                                <label className="mb-1.5 block text-sm font-medium text-gray-300">
+                                <label className="mb-1.5 block text-sm font-medium text-slate-700">
                                     Department
                                 </label>
                                 <input
@@ -154,13 +147,13 @@ export default function RegisterPage() {
                                     value={department}
                                     onChange={(e) => setDepartment(e.target.value)}
                                     placeholder="e.g. Computer Science"
-                                    className="w-full rounded-lg border border-gray-700 bg-gray-900 px-4 py-2 text-white placeholder-gray-600 text-sm focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/40 transition-all"
+                                    className="w-full rounded border border-slate-300 bg-white px-4 py-2 text-slate-900 placeholder-slate-400 text-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 transition-colors"
                                 />
                             </div>
                         )}
 
                         <div>
-                            <label className="mb-1.5 block text-sm font-medium text-gray-300">
+                            <label className="mb-1.5 block text-sm font-medium text-slate-700">
                                 Password
                             </label>
                             <input
@@ -170,23 +163,23 @@ export default function RegisterPage() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="••••••••"
-                                className="w-full rounded-lg border border-gray-700 bg-gray-900 px-4 py-2 text-white placeholder-gray-600 text-sm focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/40 transition-all"
+                                className="w-full rounded border border-slate-300 bg-white px-4 py-2 text-slate-900 placeholder-slate-400 text-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 transition-colors"
                             />
                         </div>
 
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full rounded-lg bg-green-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-green-500 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 mt-4 shadow-lg shadow-green-500/20"
+                            className="w-full rounded bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 mt-4"
                         >
-                            {loading ? 'Creating...' : 'Sign Up'}
+                            {loading ? 'Creating Account...' : 'Sign Up'}
                         </button>
                     </form>
 
-                    <p className="mt-8 text-center text-sm text-gray-400">
+                    <p className="mt-8 text-center text-sm text-slate-600">
                         Already have an account?{' '}
-                        <Link href="/login" className="text-green-400 hover:text-green-300 font-medium">
-                            Sign In
+                        <Link href="/login" className="text-slate-900 hover:text-slate-700 font-medium underline">
+                            Login
                         </Link>
                     </p>
                 </div>

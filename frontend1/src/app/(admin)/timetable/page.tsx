@@ -178,12 +178,7 @@ export default function TimetablePage() {
                 return (a.sectionId?.name || '').localeCompare(b.sectionId?.name || '');
             });
 
-            if (user?.role === 'faculty' && user?.facultyId) {
-                const facId = String(user.facultyId);
-                sortedData = sortedData.filter((entry: any) =>
-                    String(entry.facultyId?._id || entry.facultyId) === facId
-                );
-            }
+            // Remove hard-filtering for faculty so they can view the full timetable if they switch filters.
 
             setTimetable(sortedData);
         } catch (error) {
@@ -207,7 +202,7 @@ export default function TimetablePage() {
             await fetchStats();
             setMessage({
                 type: 'success',
-                text: `✅ Generated 3 timetable proposals! Showing Rank 1 (Score: ${result.rankings?.[0]?.score || 'N/A'})`
+                text: `Successfully generated 3 timetable proposals! Showing Rank 1 (Score: ${result.rankings?.[0]?.score || 'N/A'})`
             });
         } catch (error: any) {
             console.error('Failed to generate timetable:', error);
@@ -226,7 +221,7 @@ export default function TimetablePage() {
             setConflicts([]);
             setDisplayMode('timetable');
             await fetchStats();
-            setMessage({ type: 'success', text: '✅ Timetable cleared successfully' });
+            setMessage({ type: 'success', text: 'Timetable cleared successfully' });
         } catch (error: any) {
             console.error('Failed to clear timetable:', error);
             setMessage({ type: 'error', text: 'Failed to clear timetable' });
@@ -243,19 +238,19 @@ export default function TimetablePage() {
             if (result.data && result.data.length > 0) {
                 setMessage({
                     type: 'error',
-                    text: `⚠️ Found ${result.count || result.data.length} conflicts in Rank ${selectedProposal}!`
+                    text: `Found ${result.count || result.data.length} conflicts in Rank ${selectedProposal}!`
                 });
             } else {
                 setMessage({
                     type: 'success',
-                    text: `✅ No conflicts in Rank ${selectedProposal}! Timetable is conflict-free.`
+                    text: `No conflicts in Rank ${selectedProposal}! Timetable is conflict-free.`
                 });
             }
         } catch (error: any) {
             console.error('Conflict detection failed:', error);
             setMessage({
                 type: 'error',
-                text: `❌ Failed to detect conflicts: ${error.response?.data?.message || error.message}`
+                text: `Failed to detect conflicts: ${error.response?.data?.message || error.message}`
             });
         } finally {
             setDetectingConflicts(false);
@@ -264,14 +259,14 @@ export default function TimetablePage() {
 
     const handleResolveConflicts = async () => {
         setResolvingConflicts(true);
-        setMessage({ type: 'info', text: '🔄 Analyzing and resolving conflicts...' });
+        setMessage({ type: 'info', text: 'Analyzing and resolving conflicts...' });
         try {
             const result = await resolveConflicts(selectedProposal);
             setResolutionData(result.data);
             setDisplayMode('resolution');
             setMessage({
                 type: 'success',
-                text: `✅ Resolved ${result.data?.resolved || 0} out of ${result.data?.initial || 0} conflicts!`
+                text: `Resolved ${result.data?.conflictsResolved || 0} out of ${result.data?.initialConflicts || 0} conflicts!`
             });
             await fetchTimetable();
         } catch (error: any) {
@@ -344,41 +339,41 @@ export default function TimetablePage() {
         <div className="p-6 bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800">
             {/* Top-Level Dashboard */}
             <div className="mb-6 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">
-                    📊 System Overview
+                <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
+                    System Overview
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
-                        <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.totalFaculties}</div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">Total Faculties</div>
+                    <div className="bg-white dark:bg-slate-800 p-4 rounded border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <div className="text-2xl font-semibold text-slate-800 dark:text-slate-100">{stats.totalFaculties}</div>
+                        <div className="text-sm text-slate-600 dark:text-slate-400">Total Faculties</div>
                     </div>
-                    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
-                        <div className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.totalCourses}</div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">Total Courses</div>
+                    <div className="bg-white dark:bg-slate-800 p-4 rounded border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <div className="text-2xl font-semibold text-slate-800 dark:text-slate-100">{stats.totalCourses}</div>
+                        <div className="text-sm text-slate-600 dark:text-slate-400">Total Courses</div>
                     </div>
-                    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
-                        <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{stats.totalRooms}</div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">Total Rooms</div>
+                    <div className="bg-white dark:bg-slate-800 p-4 rounded border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <div className="text-2xl font-semibold text-slate-800 dark:text-slate-100">{stats.totalRooms}</div>
+                        <div className="text-sm text-slate-600 dark:text-slate-400">Total Rooms</div>
                     </div>
-                    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
-                        <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{stats.totalSections}</div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">Total Sections</div>
+                    <div className="bg-white dark:bg-slate-800 p-4 rounded border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <div className="text-2xl font-semibold text-slate-800 dark:text-slate-100">{stats.totalSections}</div>
+                        <div className="text-sm text-slate-600 dark:text-slate-400">Total Sections</div>
                     </div>
-                    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
-                        <div className="text-2xl font-bold text-pink-600 dark:text-pink-400">{stats.totalTimeslots}</div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">Total Timeslots</div>
+                    <div className="bg-white dark:bg-slate-800 p-4 rounded border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <div className="text-2xl font-semibold text-slate-800 dark:text-slate-100">{stats.totalTimeslots}</div>
+                        <div className="text-sm text-slate-600 dark:text-slate-400">Total Timeslots</div>
                     </div>
-                    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
-                        <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{stats.scheduledClasses}</div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">Scheduled Classes</div>
+                    <div className="bg-white dark:bg-slate-800 p-4 rounded border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <div className="text-2xl font-semibold text-slate-800 dark:text-slate-100">{stats.scheduledClasses}</div>
+                        <div className="text-sm text-slate-600 dark:text-slate-400">Scheduled Classes</div>
                     </div>
                 </div>
 
                 {/* Explainability & Visualization */}
                 {filteredTimetable.length > 0 && (
                     <div className="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
-                        <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-3 flex items-center">
-                            🔬 Timetable Insights & Explainability
+                        <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-3 flex items-center">
+                            Timetable Insights & Explainability
                         </h3>
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             {/* Day Distribution */}
@@ -422,10 +417,9 @@ export default function TimetablePage() {
                 )}
             </div>
 
-            {/* Quick Actions Control Panel */}
             <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">
-                    ⚡ Quick Actions
+                <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-3">
+                    Quick Actions
                 </h3>
 
                 {/* Timetable Management */}
@@ -461,23 +455,23 @@ export default function TimetablePage() {
                                 <button
                                     onClick={handleGenerate}
                                     disabled={loading}
-                                    className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+                                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded transition-colors disabled:opacity-50 flex items-center gap-2 text-sm font-medium"
                                 >
-                                    {loading ? '⏳ Processing...' : <><Rocket className="w-4 h-4" /> Generate Timetable</>}
+                                    {loading ? 'Processing...' : <><Rocket className="w-4 h-4" /> Generate Timetable</>}
                                 </button>
                                 <button
                                     onClick={() => {
                                         setDisplayMode('timetable');
                                         setFilterMode('all');
                                     }}
-                                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 dark:border-slate-600 rounded transition-colors text-sm font-medium flex items-center"
                                 >
                                     <Eye className="w-4 h-4 mr-2" /> View Timetable
                                 </button>
                                 <button
                                     onClick={handleClear}
                                     disabled={loading}
-                                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:opacity-50"
+                                    className="px-4 py-2 bg-white hover:bg-red-50 text-red-600 border border-red-200 dark:bg-slate-800 dark:hover:bg-red-900/20 dark:border-red-800/30 rounded transition-colors text-sm font-medium disabled:opacity-50 flex items-center"
                                 >
                                     <Trash2 className="w-4 h-4 mr-2" /> Clear Timetable
                                 </button>
@@ -521,9 +515,9 @@ export default function TimetablePage() {
                                 setSelectedFilter('');
                                 setDisplayMode('timetable');
                             }}
-                            className={`px-4 py-2 rounded-lg transition-colors ${filterMode === 'all'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                            className={`px-4 py-2 rounded transition-colors text-sm font-medium ${filterMode === 'all'
+                                ? 'bg-slate-800 text-white'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                                 }`}
                         >
                             <List className="w-4 h-4 mr-2" /> View All
@@ -533,9 +527,9 @@ export default function TimetablePage() {
                                 setFilterMode('faculty');
                                 setDisplayMode('timetable');
                             }}
-                            className={`px-4 py-2 rounded-lg transition-colors ${filterMode === 'faculty'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                            className={`px-4 py-2 rounded transition-colors text-sm font-medium ${filterMode === 'faculty'
+                                ? 'bg-slate-800 text-white'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                                 }`}
                         >
                             <Users className="w-4 h-4 mr-2" /> View Faculties
@@ -545,9 +539,9 @@ export default function TimetablePage() {
                                 setFilterMode('course');
                                 setDisplayMode('timetable');
                             }}
-                            className={`px-4 py-2 rounded-lg transition-colors ${filterMode === 'course'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                            className={`px-4 py-2 rounded transition-colors text-sm font-medium ${filterMode === 'course'
+                                ? 'bg-slate-800 text-white'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                                 }`}
                         >
                             <BookOpen className="w-4 h-4 mr-2" /> View Courses
@@ -557,9 +551,9 @@ export default function TimetablePage() {
                                 setFilterMode('room');
                                 setDisplayMode('timetable');
                             }}
-                            className={`px-4 py-2 rounded-lg transition-colors ${filterMode === 'room'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                            className={`px-4 py-2 rounded transition-colors text-sm font-medium ${filterMode === 'room'
+                                ? 'bg-slate-800 text-white'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                                 }`}
                         >
                             <Building2 className="w-4 h-4 mr-2" /> View Rooms
@@ -569,9 +563,9 @@ export default function TimetablePage() {
                                 setFilterMode('section');
                                 setDisplayMode('timetable');
                             }}
-                            className={`px-4 py-2 rounded-lg transition-colors ${filterMode === 'section'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                            className={`px-4 py-2 rounded transition-colors text-sm font-medium ${filterMode === 'section'
+                                ? 'bg-slate-800 text-white'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                                 }`}
                         >
                             <GraduationCap className="w-4 h-4 mr-2" /> View Sections
@@ -581,9 +575,9 @@ export default function TimetablePage() {
                                 setFilterMode('timeslot');
                                 setDisplayMode('timetable');
                             }}
-                            className={`px-4 py-2 rounded-lg transition-colors ${filterMode === 'timeslot'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                            className={`px-4 py-2 rounded transition-colors text-sm font-medium ${filterMode === 'timeslot'
+                                ? 'bg-slate-800 text-white'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                                 }`}
                         >
                             <Clock className="w-4 h-4 mr-2" /> View Timeslots
@@ -600,20 +594,20 @@ export default function TimetablePage() {
                                 <button
                                     onClick={handleDetectConflicts}
                                     disabled={detectingConflicts}
-                                    className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+                                    className="px-4 py-2 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-200 rounded transition-colors disabled:opacity-50 flex items-center gap-2 text-sm font-medium"
                                 >
                                     {detectingConflicts ? 'Scanning...' : <><Search className="w-4 h-4" /> Detect Conflicts</>}
                                 </button>
                                 <button
                                     onClick={() => setDisplayMode('conflicts')}
-                                    className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors flex items-center gap-2"
+                                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-200 rounded transition-colors flex items-center gap-2 text-sm font-medium"
                                 >
                                     <AlertTriangle className="w-4 h-4" /> View Conflicts ({conflicts.length})
                                 </button>
                                 <button
                                     onClick={handleResolveConflicts}
                                     disabled={resolvingConflicts}
-                                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+                                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded transition-colors disabled:opacity-50 flex items-center gap-2 text-sm font-medium"
                                 >
                                     {resolvingConflicts ? 'Resolving...' : <><Wrench className="w-4 h-4" /> Resolve Conflicts</>}
                                 </button>
@@ -626,9 +620,9 @@ export default function TimetablePage() {
                             <div className="flex flex-wrap gap-2">
                                 <button
                                     onClick={() => setDynamicReschedulingOpen(true)}
-                                    className="w-full sm:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md transition-all flex items-center justify-center gap-2 font-medium"
+                                    className="w-full sm:w-auto px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded shadow-sm transition-all flex items-center justify-center gap-2 text-sm font-medium"
                                 >
-                                    <RefreshCcw className="w-5 h-5" /> Dynamic Rescheduling
+                                    <RefreshCcw className="w-4 h-4" /> Dynamic Rescheduling
                                 </button>
                             </div>
                         </div>
@@ -736,7 +730,7 @@ export default function TimetablePage() {
                                             <TableCell className="px-6 py-8 text-center text-gray-500 dark:text-gray-400" colSpan={6}>
                                                 {filterMode !== 'all' && !selectedFilter
                                                     ? 'Please select a filter option above'
-                                                    : 'No timetable entries found. Click "Generate Timetable" to start.'}
+                                                    : (isFaculty ? 'No timetable entries found for this selection.' : 'No timetable entries found. Click "Generate Timetable" to start.')}
                                             </TableCell>
                                         </TableRow>
                                     )}
@@ -748,8 +742,8 @@ export default function TimetablePage() {
 
                 {displayMode === 'conflicts' && (
                     <div className="overflow-x-auto">
-                        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
-                            ⚠️ Conflict Detection Results
+                        <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4">
+                            Conflict Detection Results
                         </h3>
                         <Table>
                             <TableHeader className="bg-gray-50 dark:bg-gray-800">
@@ -798,58 +792,71 @@ export default function TimetablePage() {
                 {displayMode === 'resolution' && resolutionData && (
                     <div>
                         <div className="mb-6 p-6 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                            <h3 className="text-lg font-semibold text-green-800 dark:text-green-300 mb-4">
-                                ✅ Conflict Resolution Summary
+                            <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4">
+                                Conflict Resolution Summary
                             </h3>
                             <div className="grid grid-cols-3 gap-4 mb-4">
                                 <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
                                     <div className="text-2xl font-bold text-red-600 dark:text-red-400">
-                                        {resolutionData.initial || 0}
+                                        {resolutionData.initialConflicts || 0}
                                     </div>
                                     <div className="text-sm text-gray-600 dark:text-gray-400">Initial Conflicts</div>
                                 </div>
                                 <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
                                     <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                                        {resolutionData.resolved || 0}
+                                        {resolutionData.conflictsResolved || 0}
                                     </div>
                                     <div className="text-sm text-gray-600 dark:text-gray-400">Resolved</div>
                                 </div>
                                 <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
                                     <div className="text-2xl font-bold text-gray-600 dark:text-gray-400">
-                                        {resolutionData.remaining || 0}
+                                        {resolutionData.remainingConflicts || 0}
                                     </div>
                                     <div className="text-sm text-gray-600 dark:text-gray-400">Remaining</div>
                                 </div>
                             </div>
 
-                            {resolutionData.changes && resolutionData.changes.length > 0 && (
+                            {resolutionData.resolutionLog && resolutionData.resolutionLog.length > 0 && (
                                 <div className="mt-6">
                                     <h4 className="font-semibold text-gray-800 dark:text-gray-200 mb-3">Change Log:</h4>
                                     <div className="space-y-3">
-                                        {resolutionData.changes.map((change: ConflictResolution, index: number) => (
-                                            <div key={index} className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-                                                <div className="font-medium text-gray-900 dark:text-gray-100 mb-2">
-                                                    Change #{index + 1}: {change.className}
-                                                </div>
-                                                <div className="text-sm space-y-1">
-                                                    <div className="text-gray-700 dark:text-gray-300">
-                                                        <span className="font-medium">Action:</span> {change.action}
+                                        {resolutionData.resolutionLog.map((log: any, index: number) => {
+                                            const change = log.action;
+                                            return (
+                                                <div key={index} className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                    <div className="font-medium text-gray-900 dark:text-gray-100 mb-2">
+                                                        Change #{index + 1}: {change.courseName} ({change.sectionName})
                                                     </div>
-                                                    {change.oldValue && change.newValue && (
-                                                        <div className="text-gray-600 dark:text-gray-400">
-                                                            <span className="line-through text-red-600 dark:text-red-400">{change.oldValue}</span>
-                                                            {' → '}
-                                                            <span className="text-green-600 dark:text-green-400">{change.newValue}</span>
+                                                    <div className="text-sm space-y-1">
+                                                        <div className="text-gray-700 dark:text-gray-300">
+                                                            <span className="font-medium">Action:</span> {change.reason}
                                                         </div>
-                                                    )}
-                                                    {change.unchanged && (
-                                                        <div className="text-gray-500 dark:text-gray-500">
-                                                            {change.unchanged} (Unchanged)
-                                                        </div>
-                                                    )}
+                                                        {change.originalTimeslot && change.newTimeslot && (
+                                                            <div className="text-gray-600 dark:text-gray-400">
+                                                                <span className="line-through text-red-600 dark:text-red-400">
+                                                                    {change.originalTimeslot.day} Slot {change.originalTimeslot.slot}
+                                                                </span>
+                                                                {' → '}
+                                                                <span className="text-green-600 dark:text-green-400">
+                                                                    {change.newTimeslot.day} Slot {change.newTimeslot.slot}
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                        {change.originalRoom && change.newRoom && (
+                                                            <div className="text-gray-600 dark:text-gray-400 mt-1">
+                                                                <span className="line-through text-red-600 dark:text-red-400">
+                                                                    Room {change.originalRoom}
+                                                                </span>
+                                                                {' → '}
+                                                                <span className="text-green-600 dark:text-green-400">
+                                                                    Room {change.newRoom}
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        ))}
+                                            )
+                                        })}
                                     </div>
                                 </div>
                             )}
@@ -857,15 +864,15 @@ export default function TimetablePage() {
                             <div className="mt-6 flex gap-3">
                                 <button
                                     onClick={handleViewConflictFreeTimetable}
-                                    className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium"
+                                    className="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded transition-colors text-sm font-medium"
                                 >
-                                    👁️ View Conflict-Free Timetable
+                                    View Conflict-Free Timetable
                                 </button>
                                 <button
                                     onClick={handleExportCSV}
-                                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium"
+                                    className="px-6 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-200 rounded transition-colors text-sm font-medium"
                                 >
-                                    📥 Download File
+                                    Download File
                                 </button>
                             </div>
                         </div>

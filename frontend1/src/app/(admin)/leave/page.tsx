@@ -80,63 +80,69 @@ export default function LeavePage() {
     return (
         <div className="p-6 bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800">
             <h2 className="mb-6 text-xl font-bold text-gray-800 dark:text-gray-100">
-                🏝️ Leave Management
+                Leave Management
             </h2>
 
-            {error && (
-                <div className="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-900/30 dark:text-red-400">
-                    {error}
-                </div>
-            )}
-            {success && (
-                <div className="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg dark:bg-green-900/30 dark:text-green-400">
-                    {success}
-                </div>
-            )}
+            {
+                error && (
+                    <div className="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-900/30 dark:text-red-400">
+                        {error}
+                    </div>
+                )
+            }
+            {
+                success && (
+                    <div className="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg dark:bg-green-900/30 dark:text-green-400">
+                        {success}
+                    </div>
+                )
+            }
 
-            {isFaculty && (
-                <div className="mb-8 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Apply for Leave</h3>
-                    <form onSubmit={handleApplyLeave} className="space-y-4 max-w-lg">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Date</label>
-                            <input
-                                type="date"
-                                required
-                                value={startDate}
-                                onChange={(e) => setStartDate(e.target.value)}
-                                className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2 text-gray-900 dark:text-white"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Date</label>
-                            <input
-                                type="date"
-                                required
-                                value={endDate}
-                                onChange={(e) => setEndDate(e.target.value)}
-                                className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2 text-gray-900 dark:text-white"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Reason</label>
-                            <textarea
-                                required
-                                value={reason}
-                                onChange={(e) => setReason(e.target.value)}
-                                className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2 text-gray-900 dark:text-white"
-                                rows={3}
-                            ></textarea>
-                        </div>
-                        <button
-                            type="submit"
-                            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium"
-                        >
-                            Submit Application
-                        </button>
-                    </form>
-                </div>
-            )}
+            {
+                isFaculty && (
+                    <div className="mb-8 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Apply for Leave</h3>
+                        <form onSubmit={handleApplyLeave} className="space-y-4 max-w-lg">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Date</label>
+                                <input
+                                    type="date"
+                                    required
+                                    value={startDate}
+                                    onChange={(e) => setStartDate(e.target.value)}
+                                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2 text-gray-900 dark:text-white"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Date</label>
+                                <input
+                                    type="date"
+                                    required
+                                    value={endDate}
+                                    onChange={(e) => setEndDate(e.target.value)}
+                                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2 text-gray-900 dark:text-white"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Reason</label>
+                                <textarea
+                                    required
+                                    value={reason}
+                                    onChange={(e) => setReason(e.target.value)}
+                                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2 text-gray-900 dark:text-white"
+                                    rows={3}
+                                ></textarea>
+                            </div>
+                            <button
+                                type="submit"
+                                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition-colors font-medium"
+                            >
+                                Submit Application
+                            </button>
+                        </form>
+                    </div>
+                )
+            }
 
             <div>
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
@@ -175,9 +181,9 @@ export default function LeavePage() {
                                             {leave.reason}
                                         </TableCell>
                                         <TableCell className="px-6 py-4 text-sm">
-                                            <span className={`px-2 py-1 rounded text-xs font-medium ${leave.status === 'approved' ? 'bg-green-100 text-green-700 dark:bg-green-900/30' :
-                                                    leave.status === 'rejected' ? 'bg-red-100 text-red-700 dark:bg-red-900/30' :
-                                                        'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30'
+                                            <span className={`px-2 py-1 rounded text-xs font-medium ${leave.status === 'approved' ? 'bg-slate-200 text-slate-800 dark:bg-slate-700 dark:text-slate-200' :
+                                                leave.status === 'rejected' ? 'bg-slate-100 text-slate-500 line-through dark:bg-slate-800 dark:text-slate-500' :
+                                                    'bg-white border border-slate-300 text-slate-600 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300'
                                                 }`}>
                                                 {leave.status.toUpperCase()}
                                             </span>
@@ -186,8 +192,8 @@ export default function LeavePage() {
                                             <TableCell className="px-6 py-4 text-sm">
                                                 {leave.status === 'pending' && (
                                                     <div className="flex gap-2">
-                                                        <button onClick={() => handleStatusUpdate(leave._id, 'approved')} className="px-3 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700">Approve</button>
-                                                        <button onClick={() => handleStatusUpdate(leave._id, 'rejected')} className="px-3 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700">Reject</button>
+                                                        <button onClick={() => handleStatusUpdate(leave._id, 'approved')} className="px-3 py-1 bg-slate-800 text-white rounded text-xs hover:bg-slate-700">Approve</button>
+                                                        <button onClick={() => handleStatusUpdate(leave._id, 'rejected')} className="px-3 py-1 bg-white border border-slate-300 text-slate-700 rounded text-xs hover:bg-slate-50">Reject</button>
                                                     </div>
                                                 )}
                                             </TableCell>
@@ -205,6 +211,6 @@ export default function LeavePage() {
                     </Table>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
