@@ -132,6 +132,29 @@ This project follows a decoupled **MERN** application architecture enhanced with
 6. Toggle between standard `List View` or `Calendar View` to browse results.
 7. Click **Detect Conflicts** to verify the health of the output. 
 
+## 🌍 Live Demo & Deployment
+
+**Frontend:** [https://YOUR_VERCEL_URL.vercel.app](https://YOUR_VERCEL_URL.vercel.app)  
+**Backend:** [https://YOUR_RENDER_URL.onrender.com](https://YOUR_RENDER_URL.onrender.com)
+
+### Scan to view the Frontend!
+*(Update the URL in the README file to instantly generate your working QR code)*
+![Frontend QR Code](https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://YOUR_VERCEL_URL.vercel.app)
+
+### Deployment Steps
+**1. Backend (Render.com)**
+- Create a new Web Service and link your GitHub repository.
+- Root Directory: `timetable-backend-mern`
+- Build Command: `npm install`
+- Start Command: `npm start`
+- Environment Variables: Add `MONGODB_URI` and `JWT_SECRET`.
+
+**2. Frontend (Vercel.com)**
+- Create a new Project and link your GitHub repository.
+- Root Directory: `frontend1`
+- Framework Preset: `Next.js`
+- Environment Variables: Add `NEXT_PUBLIC_API_URL` pointing strictly to your Render backend URL with a `/api` attached at the end (e.g. `https://timetable-backend.onrender.com/api`).
+
 ## ⚖️ Automated Constraints & Scoring
 
 The generator engine utilizes a normalized heuristic scoring function out of a base `1000` points.
