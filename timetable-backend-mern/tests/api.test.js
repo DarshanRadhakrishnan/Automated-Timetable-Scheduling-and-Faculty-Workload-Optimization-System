@@ -262,8 +262,7 @@ describe('API Endpoints - Comprehensive Test Suite', () => {
                     { _id: 'p1', score: 95, entryCount: 10, updatedAt: new Date() },
                     { _id: 'p2', score: 90, entryCount: 10, updatedAt: new Date() }
                 ];
-                const mockAggregate = { allowDiskUse: jest.fn().mockResolvedValue(mockVersions) };
-                Timetable.aggregate.mockReturnValue(mockAggregate);
+                Timetable.aggregate.mockResolvedValue(mockVersions);
 
                 const res = await request(app).get('/api/timetable/versions');
 
@@ -272,8 +271,7 @@ describe('API Endpoints - Comprehensive Test Suite', () => {
             });
 
             it('should handle errors when fetching versions', async () => {
-                const mockAggregate = { allowDiskUse: jest.fn().mockRejectedValue(new Error('Database error')) };
-                Timetable.aggregate.mockReturnValue(mockAggregate);
+                Timetable.aggregate.mockRejectedValue(new Error('Database error'));
 
                 const res = await request(app).get('/api/timetable/versions');
 
